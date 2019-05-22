@@ -5,14 +5,17 @@
 //** DETECT SEGMENT PROXIMITY ****************//
 //********************************************//
 
-int Detect_Segment_Proximity(double Xs , double Ys , double X1 , double Y1 , double X2 , double Y2 , double detection_distance)
+int Detect_Segment_Proximity(double Xs, double Ys, double X1, double Y1, double X2, double Y2, double detection_distance)
 {
-    if ((Xs-X1) * (Xs-X1) + (Ys-Y1) * (Ys-Y1) < detection_distance * detection_distance) return 1 ;
-    if ((Xs-X2) * (Xs-X2) + (Ys-Y2) * (Ys-Y2) < detection_distance * detection_distance) return 1 ;
+    if ((Xs-X1) * (Xs-X1) + (Ys-Y1) * (Ys-Y1) < detection_distance * detection_distance)
+        return 1 ;
+    if ((Xs-X2) * (Xs-X2) + (Ys-Y2) * (Ys-Y2) < detection_distance * detection_distance)
+        return 1 ;
     double Xsi = -1. + 2. * ( (X2-X1) * (Xs-X1) + (Y2-Y1) * (Ys-Y1) ) / ((X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1)) ;
     if ( (Xsi<1.) && (Xsi>-1.) )
     {
-        if (abs((Y2-Y1)*(Xs-0.5*(X1+X2)-Xsi*0.5*(X2-X1))-(X2-X1)*(Ys-0.5*(Y1+Y2)-Xsi*0.5*(Y2-Y1)))<sqrt( (X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1) )*detection_distance) return 1 ;
+        if (abs((Y2-Y1)*(Xs-0.5*(X1+X2)-Xsi*0.5*(X2-X1))-(X2-X1)*(Ys-0.5*(Y1+Y2)-Xsi*0.5*(Y2-Y1)))<sqrt( (X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1) )*detection_distance)
+            return 1 ;
     }
     return 0 ;
 }
@@ -24,29 +27,30 @@ int Detect_Segment_Proximity(double Xs , double Ys , double X1 , double Y1 , dou
 //********************************************//
 
 void Update_proximity(
-	int Nb_bodies ,
-	vector<Body>& Bodies ,
-	double Xmin_period ,
-	double Xmax_period )
+    int Nb_bodies,
+    vector<Body>& Bodies,
+    double Xmin_period,
+    double Xmax_period )
 {
-	cout << endl ;
-	cout << "Updating proximities" << endl ;
-	double period = Xmax_period - Xmin_period ;
-	double invperiod = 1. / period ;
-	int flagok ;
+    cout << endl ;
+    cout << "Updating proximities" << endl ;
+    double period = Xmax_period - Xmin_period ;
+    double invperiod = 1. / period ;
+    int flagok ;
 
-	// Determining the spatial extension of each border of each body
-	#pragma omp parallel
-	{
+    // Determining the spatial extension of each border of each body
+    #pragma omp parallel
+    {
         #pragma omp for schedule(dynamic)
         for (int i=0 ; i<Nb_bodies ; i++)
         {
-            double xmin , xmax , ymin , ymax , x , y , d ;
-            int shiftmin , shiftmax , nb_border_nodes ;
+            double xmin, xmax, ymin, ymax, x, y, d ;
+            int shiftmin, shiftmax, nb_border_nodes ;
             vector<int> border_nodes ;
             Bodies[i].neighbours.clear() ;
             Bodies[i].nb_neighbours = 0 ;
-            if (Bodies[i].status == "inactive") continue ;
+            if (Bodies[i].status == "inactive")
+                continue ;
             for (int j(0) ; j<Bodies[i].nb_borders ; j++)
             {
                 xmin = 1.e100 ;
@@ -63,10 +67,14 @@ void Update_proximity(
                     //else if (Bodies[i].type=="rigid") d = Bodies[i].nodal_distance * 0.5 ;
                     d = Bodies[i].detection_distance ;
                     //
-                    if (x - d < xmin) xmin = x - d ;
-                    if (x + d > xmax) xmax = x + d ;
-                    if (y - d < ymin) ymin = y - d ;
-                    if (y + d > ymax) ymax = y + d ;
+                    if (x - d < xmin)
+                        xmin = x - d ;
+                    if (x + d > xmax)
+                        xmax = x + d ;
+                    if (y - d < ymin)
+                        ymin = y - d ;
+                    if (y + d > ymax)
+                        ymax = y + d ;
                 }
                 shiftmin = floor ( ( xmin - Xmin_period ) * invperiod ) ;
                 shiftmax = floor ( ( xmax - Xmin_period ) * invperiod ) ;
@@ -83,9 +91,10 @@ void Update_proximity(
         #pragma omp for schedule(dynamic)
         for (int body1=0 ; body1<Nb_bodies ; body1++)
         {
-            if (Bodies[body1].status == "inactive") continue ;
-            double xmin1 , xmax1 , ymin1 , ymax1 , xmin2 , xmax2 , ymin2 , ymax2 ;
-            int shiftmin1 , shiftmax1 , shiftmin2 , shiftmax2 ;
+            if (Bodies[body1].status == "inactive")
+                continue ;
+            double xmin1, xmax1, ymin1, ymax1, xmin2, xmax2, ymin2, ymax2 ;
+            int shiftmin1, shiftmax1, shiftmin2, shiftmax2 ;
             for (int border1(0) ; border1<Bodies[body1].nb_borders ; border1++)
             {
                 xmin1 = Bodies[body1].borders[border1].xmin_prox ;
@@ -96,8 +105,10 @@ void Update_proximity(
                 shiftmax1 = Bodies[body1].borders[border1].shiftmax ;
                 for (int body2(0) ; body2<Nb_bodies ; body2++)
                 {
-                    if (Bodies[body2].status == "inactive") continue ;
-                    if (body1==body2) continue ;
+                    if (Bodies[body2].status == "inactive")
+                        continue ;
+                    if (body1==body2)
+                        continue ;
                     for (int border2(0) ; border2<Bodies[body2].nb_borders ; border2++)
                     {
                         xmin2 = Bodies[body2].borders[border2].xmin_prox ;
@@ -125,7 +136,7 @@ void Update_proximity(
                                 }
                                 if (flagok ==1)
                                 {
-                                    Bodies[body1].neighbours.push_back({ body2 , border2 , shift }) ;
+                                    Bodies[body1].neighbours.push_back({ body2, border2, shift }) ;
                                     Bodies[body1].nb_neighbours++ ;
                                 }
 
@@ -141,7 +152,8 @@ void Update_proximity(
         for (int body=0 ; body<Nb_bodies ; body++)
         {
             vector<double> v(Bodies[body].nb_neighbours) ;
-            for (int i(0) ; i<Bodies[body].nb_neighbours ; i++) v[i] = 0. ;
+            for (int i(0) ; i<Bodies[body].nb_neighbours ; i++)
+                v[i] = 0. ;
             if (Bodies[body].type=="deformable")
             {
                 for (int i(0) ; i<Bodies[body].nb_nodes ; i++)
@@ -163,12 +175,12 @@ void Update_proximity(
         for (int bodyS=0 ; bodyS<Nb_bodies ; bodyS++)
         {
             int flag_detect ;
-            int nb_border_nodesS , nb_border_nodesM , bodyM , borderM , shiftM , nb_internal ;
+            int nb_border_nodesS, nb_border_nodesM, bodyM, borderM, shiftM ;
             int flag_exists ;
-            int NodeS , NodeM0 , ShiftM0 , NodeM1 , ShiftM1 , NodeM2 , ShiftM2 , NodeM3 , ShiftM3 ;
-            double Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 , N0 , N1 , N2 , N3 ;
-            double Gapn , Gapt , Xsi , Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest , length , effective_mass ;
-            vector<int> border_nodesS , NodesM0 , ShiftsM0 , NodesM1 , ShiftsM1 , NodesM2 , ShiftsM2 , NodesM3 , ShiftsM3 , Proximity_previous ;
+            int NodeS, NodeM0, ShiftM0, NodeM1, ShiftM1, NodeM2, ShiftM2, NodeM3, ShiftM3 ;
+            double Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3, N0, N1, N2, N3 ;
+            double Gapn, Xsi, Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest, length, effective_mass ;
+            vector<int> border_nodesS, NodesM0, ShiftsM0, NodesM1, ShiftsM1, NodesM2, ShiftsM2, NodesM3, ShiftsM3, Proximity_previous ;
             vector<double> Xsis ;
             vector<double> internal ;
             string interpolantM ;
@@ -213,7 +225,8 @@ void Update_proximity(
                             ShiftM2 = ShiftsM2[segmentM] ;
                             X2 = Bodies[bodyM].nodes[NodeM2].x_current + period * ( shiftM + ShiftM2 ) ;
                             Y2 = Bodies[bodyM].nodes[NodeM2].y_current ;
-                            if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0) continue ;
+                            if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0)
+                                continue ;
                             NodeM0 = NodesM0[segmentM] ;
                             ShiftM0 = ShiftsM0[segmentM] ;
                             X0 = Bodies[bodyM].nodes[NodeM0].x_current + period * ( shiftM + ShiftM0 ) ;
@@ -223,20 +236,20 @@ void Update_proximity(
                             X3 = Bodies[bodyM].nodes[NodeM3].x_current + period * ( shiftM + ShiftM3 ) ;
                             Y3 = Bodies[bodyM].nodes[NodeM3].y_current ;
                             Xsi = 0. ;
-                            Closest_2_segment(interpolantM , Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 ,
-                                              1.e-16 , Gapn , Xsi ,
-                                              Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest ,
-                                              N0 , N1 , N2 , N3 , flag_detect) ;
+                            Closest_2_segment(interpolantM, Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3,
+                                              1.e-16, Gapn, Xsi,
+                                              Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest,
+                                              N0, N1, N2, N3, flag_detect) ;
                             if ( (flag_detect==-2 || flag_detect==-1 || flag_detect==0) && (Gapn>-Bodies[bodyS].contact_distance) )
                             {
                                 flag_exists = 0 ;
                                 for (int k(0) ; k<Bodies[bodyS].nb_contact_elements ; k++)
                                 {
                                     if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
-                                        (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
-                                        (Bodies[bodyS].contact_elements[k].bodyM == bodyM) &&
-                                        (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
-                                        (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1))
+                                            (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
+                                            (Bodies[bodyS].contact_elements[k].bodyM == bodyM) &&
+                                            (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
+                                            (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1.))
                                     {
                                         new_contact = Bodies[bodyS].contact_elements[k] ;
                                         flag_exists = 1 ;
@@ -293,14 +306,15 @@ void Update_proximity(
         #pragma omp for schedule(dynamic)
         for (int bodyS=0 ; bodyS<Nb_bodies ; bodyS++)
         {
-            if (Bodies[bodyS].type=="rigid" || Bodies[bodyS].periodicity=="Periodic") continue ;
+            if (Bodies[bodyS].type=="rigid" || Bodies[bodyS].periodicity=="Periodic")
+                continue ;
             int flag_detect ;
-            int nb_border_nodesS , nb_border_nodesM , borderM , nb_internal ;
+            int nb_border_nodesS, nb_border_nodesM ;
             int flag_exists ;
-            int NodeS , NodeM0 , NodeM1 , NodeM2 , NodeM3 ;
-            double Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 , N0 , N1 , N2 , N3 ;
-            double Gapn , Gapt , Xsi , Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest , length , effective_mass ;
-            vector<int> border_nodesS , NodesM0 , NodesM1 , NodesM2 , NodesM3 , Proximity_previous ;
+            int NodeS, NodeM0, NodeM1, NodeM2, NodeM3 ;
+            double Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3, N0, N1, N2, N3 ;
+            double Gapn, Xsi, Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest, length, effective_mass ;
+            vector<int> border_nodesS, NodesM0, NodesM1, NodesM2, NodesM3, Proximity_previous ;
             vector<double> Xsis ;
             vector<double> internal ;
             string interpolantM ;
@@ -329,14 +343,17 @@ void Update_proximity(
                         for (int segmentM(0) ; segmentM<nb_border_nodesM-1 ; segmentM++)
                         {
                             NodeM1 = NodesM1[segmentM] ;
-                            if (NodeM1==NodeS) continue ;
+                            if (NodeM1==NodeS)
+                                continue ;
                             X1 = Bodies[bodyS].nodes[NodeM1].x_current ;
                             Y1 = Bodies[bodyS].nodes[NodeM1].y_current ;
                             NodeM2 = NodesM2[segmentM] ;
-                            if (NodeM2==NodeS) continue ;
+                            if (NodeM2==NodeS)
+                                continue ;
                             X2 = Bodies[bodyS].nodes[NodeM2].x_current ;
                             Y2 = Bodies[bodyS].nodes[NodeM2].y_current ;
-                            if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0) continue ;
+                            if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0)
+                                continue ;
                             NodeM0 = NodesM0[segmentM] ;
                             X0 = Bodies[bodyS].nodes[NodeM0].x_current ;
                             Y0 = Bodies[bodyS].nodes[NodeM0].y_current ;
@@ -346,17 +363,17 @@ void Update_proximity(
                             Xsi = 0. ;
                             if (NodeM0==NodeS || NodeM3==NodeS)
                             {
-                                Closest_2_segment_self(Xs , Ys , X1 , Y1 , X2 , Y2 ,
-                                                      1.e-16 , Gapn , Xsi ,
-                                                      Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest ,
-                                                      N0 , N1 , N2 , N3 , flag_detect) ;
+                                Closest_2_segment_self(Xs, Ys, X1, Y1, X2, Y2,
+                                                       1.e-16, Gapn, Xsi,
+                                                       Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest,
+                                                       N0, N1, N2, N3, flag_detect) ;
                             }
                             else
                             {
-                                Closest_2_segment(interpolantM , Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 ,
-                                                  1.e-16 , Gapn , Xsi ,
-                                                  Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest ,
-                                                  N0 , N1 , N2 , N3 , flag_detect) ;
+                                Closest_2_segment(interpolantM, Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3,
+                                                  1.e-16, Gapn, Xsi,
+                                                  Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest,
+                                                  N0, N1, N2, N3, flag_detect) ;
                             }
                             //if ( (-1.<=Xsi) && (Xsi<1.) && (Gapn>-Bodies[bodyS].contact_distance) )
                             if ( flag_detect==0 && (Gapn>-Bodies[bodyS].contact_distance) )
@@ -368,10 +385,10 @@ void Update_proximity(
                                     //    (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
                                     //    (Bodies[bodyS].contact_elements[k].bodyM == bodyS))
                                     if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
-                                        (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
-                                        (Bodies[bodyS].contact_elements[k].bodyM == bodyS) &&
-                                        (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
-                                        (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1.))
+                                            (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
+                                            (Bodies[bodyS].contact_elements[k].bodyM == bodyS) &&
+                                            (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
+                                            (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1.))
                                     {
                                         new_contact = Bodies[bodyS].contact_elements[k] ;
                                         flag_exists = 1 ;
@@ -423,7 +440,7 @@ void Update_proximity(
             Bodies[bodyS].nb_contact_elements = nb_contact_elements ;
             Bodies[bodyS].contact_elements = contact_elements ;
         }
-	}
+    }
 }
 
 
@@ -432,13 +449,14 @@ void Update_proximity(
 //** INITIALIZE CZM **************************//
 //********************************************//
 
-void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws , vector<Contact_law>& Contact_laws , vector<int>& flags , double Xmin_period , double Xmax_period)
+void Initialize_CZM(int Nb_bodies, vector<Body>& Bodies, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<int>& flags, double Xmin_period, double Xmax_period)
 {
     cout << "Initializing cohesive bonds" << endl ;
-    for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_contacts(Bodies , Xmin_period , Xmax_period) ;
+    for (int i=0 ; i<Nb_bodies ; i++)
+        Bodies[i].Update_contacts(Bodies, Xmin_period, Xmax_period) ;
     flags[3] = 0 ;
     int bodyM ;
-    string contact_law_type , material_nameM , material_nameS , material1 , material2 ;
+    string contact_law_type, material_nameM, material_nameS, material1, material2 ;
     for (int bodyS(0) ; bodyS<Nb_bodies ; bodyS++)
     {
         for (int icontact(0) ; icontact<Bodies[bodyS].nb_contact_elements ; icontact++)
@@ -451,7 +469,7 @@ void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws ,
                 material1 = Contact_laws[i].material1 ;
                 material2 = Contact_laws[i].material2 ;
                 if (((material1==material_nameS) && (material2==material_nameM)) ||
-                    ((material2==material_nameS) && (material1==material_nameM)))
+                        ((material2==material_nameS) && (material1==material_nameM)))
                 {
                     contact_law_type = Contact_laws[i].type ;
                     break ;
@@ -468,8 +486,10 @@ void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws ,
             if (contact_law_type=="CZMfatigue" || contact_law_type=="BondedMohrCoulomb")
             {
                 Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
-                if ( abs( Bodies[bodyS].contact_elements[icontact].gapn / Bodies[bodyS].contact_elements[icontact].length ) < 1.e-3 )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
-                else                                                                                                                    Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
+                if ( abs( Bodies[bodyS].contact_elements[icontact].gapn ) < 1.e-6 )
+                    Bodies[bodyS].contact_elements[icontact].internal = {0., 0., 0.} ;
+                else
+                    Bodies[bodyS].contact_elements[icontact].internal = {1., 0., 0.} ;
                 //Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
             }
             // NB : other contact laws to initialize ?
@@ -486,10 +506,10 @@ void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws ,
 //********************************************//
 
 void Update_status(
-	int Nb_bodies ,
-	vector<Body>& Bodies ,
-	int Nb_deactivated ,
-	vector<vector<double>>& Deactivated)
+    int Nb_bodies,
+    vector<Body>& Bodies,
+    int Nb_deactivated,
+    vector<vector<double>>& Deactivated)
 {
     double x ;
     double y ;
@@ -530,21 +550,30 @@ void Update_status(
             }
             if (Deactivated[i][1] == 0)
             {
-                if (Deactivated[i][4] == 0 & x <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & x == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & x >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (x <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (x == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (x >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 1)
             {
-                if (Deactivated[i][4] == 0 & y <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & y == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & y >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (y <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (y == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (y >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 2)
             {
-                if (Deactivated[i][4] == 0 & r <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & r == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & r >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (r <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (r == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (r >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
         }
         else if (Deactivated[i][0] == 1)
@@ -580,27 +609,39 @@ void Update_status(
             }
             if (Deactivated[i][1] == 0)
             {
-                if (Deactivated[i][4] == 0 & x <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & x == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & x >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (x <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (x == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (x >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 1)
             {
-                if (Deactivated[i][4] == 0 & y <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & y == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & y >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (y <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (y == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (y >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 2)
             {
-                if (Deactivated[i][4] == 0 & pow(x*x+y+y,0.5) <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & pow(x*x+y+y,0.5) == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & pow(x*x+y+y,0.5) >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
             {
-                if (Deactivated[i][4] == 0 & r <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & r == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & r >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (r <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (r == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (r >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
         }
         else if (Deactivated[i][0] == 2)
@@ -636,27 +677,39 @@ void Update_status(
             }
             if (Deactivated[i][1] == 0)
             {
-                if (Deactivated[i][4] == 0 & x <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & x == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & x >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (x <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (x == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (x >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 1)
             {
-                if (Deactivated[i][4] == 0 & y <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & y == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & y >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (y <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (y == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (y >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 2)
             {
-                if (Deactivated[i][4] == 0 & pow(x*x+y+y,0.5) <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & pow(x*x+y+y,0.5) == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & pow(x*x+y+y,0.5) >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
             {
-                if (Deactivated[i][4] == 0 & r <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & r == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & r >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (r <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (r == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (r >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
         }
         else if (Deactivated[i][0] == 3)
@@ -692,27 +745,39 @@ void Update_status(
             }
             if (Deactivated[i][1] == 0)
             {
-                if (Deactivated[i][4] == 0 & x <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & x == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & x >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (x <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (x == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (x >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 1)
             {
-                if (Deactivated[i][4] == 0 & y <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & y == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & y >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (y <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (y == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (y >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 2)
             {
-                if (Deactivated[i][4] == 0 & pow(x*x+y+y,0.5) <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & pow(x*x+y+y,0.5) == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & pow(x*x+y+y,0.5) >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
             {
-                if (Deactivated[i][4] == 0 & r <= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 1 & r == Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if (Deactivated[i][4] == 2 & r >= Deactivated[i][5]) Bodies[Deactivated[i][2]].status = "inactive" ;
+                if ((Deactivated[i][4] == 0) & (r <= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 1) & (r == Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
+                else if ((Deactivated[i][4] == 2) & (r >= Deactivated[i][5]))
+                    Bodies[Deactivated[i][2]].status = "inactive" ;
             }
         }
         else if (Deactivated[i][0] == 4)
@@ -843,27 +908,39 @@ void Update_status(
             }
             if (Deactivated[i][1] == 0)
             {
-                if (Deactivated[i][5] == 0 & x <= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 1 & x == Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 2 & x >= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
+                if ((Deactivated[i][5] == 0) & (x <= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 1) & (x == Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 2) & (x >= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 1)
             {
-                if (Deactivated[i][5] == 0 & y <= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 1 & y == Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 2 & y >= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
+                if ((Deactivated[i][5] == 0) & (y <= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 1) & (y == Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 2) & (y >= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 2)
             {
-                if (Deactivated[i][5] == 0 & pow(x*x+y+y,0.5) <= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 1 & pow(x*x+y+y,0.5) == Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 2 & pow(x*x+y+y,0.5) >= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
+                if ((Deactivated[i][5] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
             {
-                if (Deactivated[i][5] == 0 & r <= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 1 & r == Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if (Deactivated[i][5] == 2 & r >= Deactivated[i][6]) Bodies[Deactivated[i][3]].status = "inactive" ;
+                if ((Deactivated[i][5] == 0) & (r <= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 1) & (r == Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
+                else if ((Deactivated[i][5] == 2) & (r >= Deactivated[i][6]))
+                    Bodies[Deactivated[i][3]].status = "inactive" ;
             }
         }
         else if (Deactivated[i][0] == 8)
@@ -871,9 +948,12 @@ void Update_status(
             //cout << Desactivated[i][0] << Desactivated[i][1] << endl ;
             Bodies[Deactivated[i][1]].Update_damage() ;
             //current_monitoring.push_back(Bodies[Desactivated[i][1]].damage) ;
-            if (Deactivated[i][2] == 0 & Bodies[Deactivated[i][1]].damage <= Deactivated[i][3]) Bodies[Deactivated[i][1]].status = "inactive" ;
-            else if (Deactivated[i][2] == 1 & Bodies[Deactivated[i][1]].damage == Deactivated[i][3]) Bodies[Deactivated[i][1]].status = "inactive" ;
-            else if (Deactivated[i][2] == 2 & Bodies[Deactivated[i][1]].damage >= Deactivated[i][3]) Bodies[Deactivated[i][1]].status = "inactive" ;
+            if ((Deactivated[i][2] == 0) & (Bodies[Deactivated[i][1]].damage <= Deactivated[i][3]))
+                Bodies[Deactivated[i][1]].status = "inactive" ;
+            else if ((Deactivated[i][2] == 1) & (Bodies[Deactivated[i][1]].damage == Deactivated[i][3]))
+                Bodies[Deactivated[i][1]].status = "inactive" ;
+            else if ((Deactivated[i][2] == 2) & (Bodies[Deactivated[i][1]].damage >= Deactivated[i][3]))
+                Bodies[Deactivated[i][1]].status = "inactive" ;
         }
     }
 
@@ -890,12 +970,12 @@ void Update_status(
 //********************************************//
 
 void Update_contact_pressures(
-	int Nb_bodies ,
-	vector<Body>& Bodies )
+    int Nb_bodies,
+    vector<Body>& Bodies )
 {
-	// Initializing contact pressures
-	#pragma omp parallel
-	{
+    // Initializing contact pressures
+    #pragma omp parallel
+    {
         #pragma omp for schedule(dynamic)
         for (int i=0 ; i<Nb_bodies ; i++)
         {
@@ -908,14 +988,14 @@ void Update_contact_pressures(
                 }
             }
         }
-	}
+    }
 
-	// Computing contact pressures
-    int bodyM , borderM , nodeM1 , nodeM2 , borderS , border_nodeS ;
-    double fx , fy , invlength , shapeM1 , shapeM2 ;
+    // Computing contact pressures
+    int bodyM, borderM, nodeM1, nodeM2, borderS, border_nodeS ;
+    double fx, fy, invlength, shapeM1, shapeM2 ;
     // NB : possible conflict in memory writing, could only be parallelized with two-steps writing
     //#pragma omp parallel
-	{
+    {
         //#pragma omp for schedule(dynamic)
         for (int i=0 ; i<Nb_bodies ; i++)
         {
@@ -943,7 +1023,7 @@ void Update_contact_pressures(
                 Bodies[bodyM].borders[borderM].y_contact_pressure[nodeM2] -= fy * invlength * shapeM2 ;
             }
         }
-	}
+    }
 }
 
 

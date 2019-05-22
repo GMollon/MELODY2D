@@ -109,9 +109,6 @@ void Apply_Mohr_Coulomb(double kn , double kt , double fric , double coh , doubl
 
 void Apply_Damped_Mohr_Coulomb(double kn , double kt , double fric , double coh , double tens , double damp , double mass , double length , double gapn , double vgapn , double& gapt , double vgapt , double& Pn , double& Pt)
 {
-    //cout << "damp " << damp << " gapn " << gapn << " vgagn " << vgapn << " mass " << mass << " Pn " << Pn << endl ;
-    //cout << -kn * gapn << endl ;
-    //cout << damp * vgapn * sqrt(mass * kn) << endl ;
 	Pn = -kn * gapn ;
 	if (gapn<0.) Pn -= damp * vgapn * 2. * sqrt(mass * kn / length) ;
 	if (Pn<-tens)
@@ -130,7 +127,6 @@ void Apply_Damped_Mohr_Coulomb(double kn , double kt , double fric , double coh 
             gapt = -Pt / kt ;
         }
 	}
-	//cout << "damp " << damp << " gapn " << gapn << " vgagn " << vgapn << " mass " << mass << " Pn " << Pn << endl ;
 }
 
 

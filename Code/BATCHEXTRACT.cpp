@@ -32,7 +32,8 @@ main(int argc, char **argv)
 	vector<Contact_law> Contact_laws ;
 	string Solver ;
 	double Tini , Deltat , Tend , Time ;
-	double Target_error , Control_parameter , Accepted_ratio ;
+    double Target_error, Inv_Target_error, Control_parameter, Accepted_ratio ;
+    double Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling ;
 	double Save_period , Print_period , Contact_update_period ;
 	double Next_save , Next_print , Next_contact_update ;
 	int Number_save , Number_print , Number_iteration ;
@@ -56,15 +57,16 @@ main(int argc, char **argv)
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //
-	Load_static( Simulation_name , Nb_materials , Materials ,
-		Nb_contact_laws , Contact_laws , Contacts_Table ,
-		Solver , Tini ,	Deltat , Tend ,
-		Target_error , Control_parameter , Accepted_ratio ,
-		Save_period , Print_period , Contact_update_period ,
-		Xmin_period , Xmax_period , Penalty , Xgravity , Ygravity ,
-		Activate_plot ,	Xmin_plot ,	Xmax_plot ,	Ymin_plot ,	Ymax_plot ,
-		Nb_monitored , Monitored , Nb_deactivated , Deactivated , Nb_spies , Spies ,
-		Nb_regions , Regions , Nb_bodies , Bodies , To_Plot ) ;
+    Load_static( Simulation_name, Nb_materials, Materials,
+                 Nb_contact_laws, Contact_laws, Contacts_Table,
+                 Solver, Tini,	Deltat, Tend,
+                 Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                 Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
+                 Save_period, Print_period, Contact_update_period,
+                 Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,
+                 Activate_plot,	Xmin_plot,	Xmax_plot,	Ymin_plot,	Ymax_plot,
+                 Nb_monitored, Monitored, Nb_deactivated, Deactivated, Nb_spies, Spies,
+                 Nb_regions, Regions, Nb_bodies, Bodies, To_Plot ) ;
 
 	int istart = atoi(argv[1]) ;
 	int interval = atoi(argv[2]) ;

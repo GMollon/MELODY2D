@@ -1,0 +1,9 @@
+
+*.asc
+*.vtk
+*.exe
+*.dll
+*.depend
+*.cbp
+*.o
+*.m
