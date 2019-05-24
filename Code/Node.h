@@ -58,6 +58,7 @@ public :
     double y_alid_force ;
     double x_force ;
     double y_force ;
+    double unbalanced ;
     double jacobian ;
     double Sxx ;
     double Syy ;
@@ -169,6 +170,7 @@ Node::Node (double x, double y, double d, double mx, double my, double imx, doub
     y_alid_force = 0. ;
     x_force = 0. ;
     y_force = 0. ;
+    unbalanced = 0. ;
     jacobian = 1. ;
     Sxx = 0. ;
     Syy = 0. ;
@@ -230,6 +232,14 @@ void Node::Sum_up_forces()
     }
     x_force = x_internal_force + x_contact_force + x_self_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force + x_alid_force ;
     y_force = y_internal_force + y_contact_force + y_self_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force + y_alid_force ;
+    unbalanced = sqrt(x_force * x_force + y_force * y_force) / (sqrt(x_internal_force * x_internal_force + y_internal_force * y_internal_force)
+                                                              + sqrt(x_contact_force * x_contact_force + y_contact_force * y_contact_force)
+                                                              + sqrt(x_self_contact_force * x_self_contact_force + y_self_contact_force * y_self_contact_force)
+                                                              + sqrt(x_body_force * x_body_force + y_body_force * y_body_force)
+                                                              + sqrt(x_dirichlet_force * x_dirichlet_force + y_dirichlet_force * y_dirichlet_force)
+                                                              + sqrt(x_neumann_force * x_neumann_force + y_neumann_force * y_neumann_force)
+                                                              + sqrt(x_damping_force * x_damping_force + y_damping_force * y_damping_force)
+                                                              + sqrt(x_alid_force * x_alid_force + y_alid_force * y_alid_force)) ;
 }
 
 void Node::Apply_Newton()

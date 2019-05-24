@@ -838,7 +838,7 @@ void Write_graphic(int Nb_bodies,
         {
             bo = indicestot[j][0] ;
             no = indicestot[j][1] ;
-            Graphic_file << Bodies[bo].nodes[no].factor_mass_scaling << endl ;
+            Graphic_file << Bodies[bo].nodes[no].unbalanced << endl ;
         }
         Graphic_file << endl ;
     }

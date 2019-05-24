@@ -104,6 +104,7 @@ public :
     double x_force ;
     double y_force ;
     double r_force ;
+    double unbalanced ;
     double total_error ;
     double max_error ;
     int node_for_max_error ;
@@ -266,6 +267,7 @@ Body::Body (int i, string m, string p, string t)
     x_force = 0. ;
     y_force = 0. ;
     r_force = 0. ;
+    unbalanced = 0. ;
     total_error = 0. ;
     max_error = 0. ;
     node_for_max_error = 0 ;
@@ -1860,6 +1862,11 @@ void Body::Sum_up_forces()
         x_force = x_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force ;
         y_force = y_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force ;
         r_force = r_contact_force + r_body_force + r_dirichlet_force + r_neumann_force + r_damping_force ;
+        unbalanced = sqrt(x_force * x_force + y_force * y_force) / (sqrt(x_contact_force * x_contact_force + y_contact_force * y_contact_force)
+                                                                  + sqrt(x_body_force * x_body_force + y_body_force * y_body_force)
+                                                                  + sqrt(x_dirichlet_force * x_dirichlet_force + y_dirichlet_force * y_dirichlet_force)
+                                                                  + sqrt(x_neumann_force * x_neumann_force + y_neumann_force * y_neumann_force)
+                                                                  + sqrt(x_damping_force * x_damping_force + y_damping_force * y_damping_force)) ;
         for (int i(0) ; i<nb_nodes ; i++)
         {
             nodes[i].x_contact_force = x_contact_force ;

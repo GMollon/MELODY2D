@@ -153,7 +153,7 @@ main(int argc, char **argv)
                                 Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
                                 Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
                                 neval, max_error, mean_error, flags, total_mass, max_mass, Solver) ;
-            cout << "   SOLVER : " << Solver << " " << endl ;
+            //cout << "   SOLVER : " << Solver << " " << endl ;
         }
 
 
