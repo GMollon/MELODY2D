@@ -131,7 +131,7 @@ while 1
       count
   end
   if max(sqrt(sum(deltat*Ftot(d<-geps,:).^2,2))/h0)<dptol, break; end
-  if count>10000,break;end
+  if count>1000,break;end
 end
 
 % Clean up and plot final mesh

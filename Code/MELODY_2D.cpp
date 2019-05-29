@@ -31,7 +31,7 @@ main(int argc, char **argv)
 	cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                     Main Program                      %%" << endl ;
-	cout << "%%          Version 3.86 ; 13th of April 2019            %%" << endl ;
+	cout << "%%           Version 3.87 ; 23rd of May 2019             %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
 	cout << "%%                                                       %%" << endl ;

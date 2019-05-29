@@ -672,28 +672,28 @@ void Load_static(
 				}
 				else if (type=="CZMlinear")
 				{
-					double p1, p2, p3, p4, p5 ;
-					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+					double p1, p2, p3, p4, p5, p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
 					getline(Static_Control_file, token) ;
-					vector<double> parameters({p1, p2, p3, p4, p5}) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
 					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
 					Contact_laws.push_back(law) ;
 				}
 				else if (type=="CZMfatigue")
 				{
-					double p1, p2, p3, p4, p5, p6, p7, p8 ;
-					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 ;
+					double p1, p2, p3, p4, p5, p6, p7, p8, p9 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 ;
 					getline(Static_Control_file, token) ;
-					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8}) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9}) ;
 					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
 					Contact_laws.push_back(law) ;
 				}
 				else if (type=="BondedMohrCoulomb")
 				{
-					double p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ;
-					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 >> p10 ;
+					double p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 >> p10 >> p11 ;
 					getline(Static_Control_file, token) ;
-					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9, p10}) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11}) ;
 					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
 					Contact_laws.push_back(law) ;
 				}

@@ -446,6 +446,7 @@ void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws ,
             bodyM = Bodies[bodyS].contact_elements[icontact].bodyM ;
             material_nameM = Bodies[bodyM].material_name ;
             material_nameS = Bodies[bodyS].material_name ;
+            vector<double> parameters ;
             for (int i(0) ; i<Nb_contact_laws ; i++)
             {
                 material1 = Contact_laws[i].material1 ;
@@ -454,24 +455,32 @@ void Initialize_CZM(int Nb_bodies , vector<Body>& Bodies , int Nb_contact_laws ,
                     ((material2==material_nameS) && (material1==material_nameM)))
                 {
                     contact_law_type = Contact_laws[i].type ;
+                    parameters = Contact_laws[i].parameters ;
                     break ;
                 }
             }
             if (contact_law_type=="CZMlinear")
             {
+                double gapinit = parameters[5] ;
                 Bodies[bodyS].contact_elements[icontact].nb_internal = 1 ;
-                //if ( abs( Bodies[bodyS].contact_elements[icontact].gapn) < 1.e-6 )   Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
-                //else                                                                 Bodies[bodyS].contact_elements[icontact].internal = {1.} ;
-                Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1.} ;
+            }
+            else if (contact_law_type=="CZMfatigue")
+            {
+                double gapinit = parameters[8] ;
+                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
+            }
+            else if (contact_law_type=="BondedMohrCoulomb")
+            {
+                double gapinit = parameters[10] ;
+                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
             }
 
-            if (contact_law_type=="CZMfatigue" || contact_law_type=="BondedMohrCoulomb")
-            {
-                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
-                if ( abs( Bodies[bodyS].contact_elements[icontact].gapn / Bodies[bodyS].contact_elements[icontact].length ) < 1.e-3 )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
-                else                                                                                                                    Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
-                //Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
-            }
             // NB : other contact laws to initialize ?
         }
     }
