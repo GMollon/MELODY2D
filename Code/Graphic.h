@@ -209,7 +209,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[0] == 1 )
     {
-        Graphic_file << "SCALARS 00-Body_index float 1" << endl ;
+        Graphic_file << "SCALARS 00_Body_index float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -222,7 +222,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[1] == 1 )
     {
-        Graphic_file << "SCALARS 01-Initial_position float 2" << endl ;
+        Graphic_file << "SCALARS 01_Initial_position float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -240,7 +240,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[2] == 1 )
     {
-        Graphic_file << "SCALARS 02-Current_position float 2" << endl ;
+        Graphic_file << "SCALARS 02_Current_position float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -258,7 +258,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[3] == 1 )
     {
-        Graphic_file << "SCALARS 03-Displacement float 2" << endl ;
+        Graphic_file << "SCALARS 03_Displacement float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -276,7 +276,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[4] == 1 )
     {
-        Graphic_file << "SCALARS 04-Velocity float 2" << endl ;
+        Graphic_file << "SCALARS 04_Velocity float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -294,7 +294,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[5] == 1 )
     {
-        Graphic_file << "SCALARS 05-Acceleration float 2" << endl ;
+        Graphic_file << "SCALARS 05_Acceleration float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -312,7 +312,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[6] == 1 )
     {
-        Graphic_file << "SCALARS 06-Force float 2" << endl ;
+        Graphic_file << "SCALARS 06_Force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -330,7 +330,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[7] == 1 )
     {
-        Graphic_file << "SCALARS 07-Internal_force float 2" << endl ;
+        Graphic_file << "SCALARS 07_Internal_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -348,7 +348,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[8] == 1 )
     {
-        Graphic_file << "SCALARS 08-Contact_force float 2" << endl ;
+        Graphic_file << "SCALARS 08_Contact_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -366,7 +366,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[9] == 1 )
     {
-        Graphic_file << "SCALARS 09-Body_force float 2" << endl ;
+        Graphic_file << "SCALARS 09_Body_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -384,7 +384,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[10] == 1 )
     {
-        Graphic_file << "SCALARS 10-Dirichlet_force float 2" << endl ;
+        Graphic_file << "SCALARS 10_Dirichlet_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -402,7 +402,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[11] == 1 )
     {
-        Graphic_file << "SCALARS 11-Neumann_force float 2" << endl ;
+        Graphic_file << "SCALARS 11_Neumann_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -420,7 +420,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[12] == 1 )
     {
-        Graphic_file << "SCALARS 12-Damping_force float 2" << endl ;
+        Graphic_file << "SCALARS 12_Damping_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -438,7 +438,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[13] == 1 )
     {
-        Graphic_file << "SCALARS 13-Alid_force float 2" << endl ;
+        Graphic_file << "SCALARS 13_Alid_force float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -456,7 +456,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[14] == 1 )
     {
-        Graphic_file << "SCALARS 14-Jacobian float 1" << endl ;
+        Graphic_file << "SCALARS 14_Jacobian float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -469,7 +469,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[15] == 1 )
     {
-        Graphic_file << "SCALARS 15-Cauchy_XX_stress float 1" << endl ;
+        Graphic_file << "SCALARS 15_Cauchy_XX_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -484,7 +484,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[16] == 1 )
     {
-        Graphic_file << "SCALARS 16-Cauchy_YY_stress float 1" << endl ;
+        Graphic_file << "SCALARS 16_Cauchy_YY_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -499,7 +499,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[17] == 1 )
     {
-        Graphic_file << "SCALARS 17-Cauchy_XY_stress float 1" << endl ;
+        Graphic_file << "SCALARS 17_Cauchy_XY_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -514,7 +514,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[18] == 1 )
     {
-        Graphic_file << "SCALARS 18-Cauchy_ZZ_stress float 1" << endl ;
+        Graphic_file << "SCALARS 18_Cauchy_ZZ_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -529,7 +529,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[19] == 1 )
     {
-        Graphic_file << "SCALARS 19-Tresca_stress float 1" << endl ;
+        Graphic_file << "SCALARS 19_Tresca_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -544,7 +544,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[20] == 1 )
     {
-        Graphic_file << "SCALARS 20-Von_Mises_stress float 1" << endl ;
+        Graphic_file << "SCALARS 20_Von_Mises_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -559,7 +559,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[21] == 1 )
     {
-        Graphic_file << "SCALARS 21-Major_principal_stress float 1" << endl ;
+        Graphic_file << "SCALARS 21_Major_principal_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -574,7 +574,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[22] == 1 )
     {
-        Graphic_file << "SCALARS 22-Intermediate_principal_stress float 1" << endl ;
+        Graphic_file << "SCALARS 22_Intermediate_principal_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -589,7 +589,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[23] == 1 )
     {
-        Graphic_file << "SCALARS 23-Minor_principal_stress float 1" << endl ;
+        Graphic_file << "SCALARS 23_Minor_principal_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -604,7 +604,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[24] == 1 )
     {
-        Graphic_file << "SCALARS 24-Spherical_stress float 1" << endl ;
+        Graphic_file << "SCALARS 24_Spherical_stress float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -619,7 +619,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[25] == 1 )
     {
-        Graphic_file << "SCALARS 25-Green-Lagrange_XX_Strain float 1" << endl ;
+        Graphic_file << "SCALARS 25_Green-Lagrange_XX_Strain float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -634,7 +634,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[26] == 1 )
     {
-        Graphic_file << "SCALARS 26-Green-Lagrange_YY_Strain float 1" << endl ;
+        Graphic_file << "SCALARS 26_Green-Lagrange_YY_Strain float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -649,7 +649,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[27] == 1 )
     {
-        Graphic_file << "SCALARS 27-Green-Lagrange_XY_Strain float 1" << endl ;
+        Graphic_file << "SCALARS 27_Green-Lagrange_XY_Strain float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -664,7 +664,7 @@ void Write_graphic(int Nb_bodies ,
 
     if ( To_Plot[28] == 1 )
     {
-        Graphic_file << "SCALARS 28-Green-Lagrange_Norm float 1" << endl ;
+        Graphic_file << "SCALARS 28_Green-Lagrange_Norm float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -679,7 +679,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[29] == 1 )
     {
-        Graphic_file << "SCALARS 29-Body_Damage float 1" << endl ;
+        Graphic_file << "SCALARS 29_Body_Damage float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -691,7 +691,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[30] == 1 )
     {
-        Graphic_file << "SCALARS 30-Normalized_displacement_error float 1" << endl ;
+        Graphic_file << "SCALARS 30_Normalized_displacement_error float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -704,7 +704,7 @@ void Write_graphic(int Nb_bodies ,
 
 	if ( To_Plot[31] == 1 )
     {
-        Graphic_file << "SCALARS 31-Displacement_error float 2" << endl ;
+        Graphic_file << "SCALARS 31_Displacement_error float 2" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {

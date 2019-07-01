@@ -10,4 +10,4 @@
 module load intel/11.1.080
 cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=$PBS_NUM_PPN
-./MELODY_2D 0
+./MELODY_2D_3.87 0

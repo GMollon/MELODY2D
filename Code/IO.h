@@ -1856,7 +1856,7 @@ void Load_dynamic(
 		//cout << "Kinematics" << endl ;
 		}
 
-		if (line.substr(0,10)=="FORCES")
+		if (line.substr(0,6)=="FORCES")
 		{
 		    if (flag_body_rigid==0)
             {
@@ -1966,7 +1966,7 @@ void Load_dynamic(
 		//cout << "Neighbours" << endl ;
 		}
 
-		if (line.substr(0,8)=="BORDERS")
+		if (line.substr(0,7)=="BORDERS")
 		{
             for (int i(0) ; i < Bodies[index_body].nb_borders ; i++)
             {
