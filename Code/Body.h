@@ -1862,11 +1862,11 @@ void Body::Sum_up_forces()
         x_force = x_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force ;
         y_force = y_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force ;
         r_force = r_contact_force + r_body_force + r_dirichlet_force + r_neumann_force + r_damping_force ;
-        unbalanced = sqrt(x_force * x_force + y_force * y_force) / (sqrt(x_contact_force * x_contact_force + y_contact_force * y_contact_force)
+        unbalanced = sqrt(x_force * x_force + y_force * y_force) ;/*/ (sqrt(x_contact_force * x_contact_force + y_contact_force * y_contact_force)
                                                                   + sqrt(x_body_force * x_body_force + y_body_force * y_body_force)
                                                                   + sqrt(x_dirichlet_force * x_dirichlet_force + y_dirichlet_force * y_dirichlet_force)
                                                                   + sqrt(x_neumann_force * x_neumann_force + y_neumann_force * y_neumann_force)
-                                                                  + sqrt(x_damping_force * x_damping_force + y_damping_force * y_damping_force)) ;
+                                                                  + sqrt(x_damping_force * x_damping_force + y_damping_force * y_damping_force)) ;*/
         for (int i(0) ; i<nb_nodes ; i++)
         {
             nodes[i].x_contact_force = x_contact_force ;
@@ -2409,6 +2409,7 @@ void Body::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     }
     else if (type == "rigid")
     {
+        // MULTIPLICATIVE
         if (total_error >= Target_error * Error_factor_mass_scaling)
         {
             delta_factor_mass_scaling = pow((total_error * Inv_Target_error / Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
@@ -2423,6 +2424,23 @@ void Body::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
             if(factor_mass_scaling < 1)
                 factor_mass_scaling = 1;
         }
+
+        //ADDITIVE
+        if (total_error >= Target_error * Error_factor_mass_scaling)
+        {
+            delta_factor_mass_scaling = pow((total_error - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+            factor_mass_scaling += delta_factor_mass_scaling ;
+            if (factor_mass_scaling >= Max_mass_scaling)
+                factor_mass_scaling = Max_mass_scaling ;
+        }
+        else
+        {
+            if(factor_mass_scaling != 1)
+                factor_mass_scaling *= Decrease_factor_mass_scaling ;
+            if(factor_mass_scaling < 1)
+                factor_mass_scaling = 1;
+        }
+
         mass_mass_scaling = mass * factor_mass_scaling ;
     }
 

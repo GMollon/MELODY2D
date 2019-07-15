@@ -232,14 +232,14 @@ void Node::Sum_up_forces()
     }
     x_force = x_internal_force + x_contact_force + x_self_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force + x_alid_force ;
     y_force = y_internal_force + y_contact_force + y_self_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force + y_alid_force ;
-    unbalanced = sqrt(x_force * x_force + y_force * y_force) / (sqrt(x_internal_force * x_internal_force + y_internal_force * y_internal_force)
+    unbalanced = sqrt(x_force * x_force + y_force * y_force) ; /*/ (sqrt(x_internal_force * x_internal_force + y_internal_force * y_internal_force)
                                                               + sqrt(x_contact_force * x_contact_force + y_contact_force * y_contact_force)
                                                               + sqrt(x_self_contact_force * x_self_contact_force + y_self_contact_force * y_self_contact_force)
                                                               + sqrt(x_body_force * x_body_force + y_body_force * y_body_force)
                                                               + sqrt(x_dirichlet_force * x_dirichlet_force + y_dirichlet_force * y_dirichlet_force)
                                                               + sqrt(x_neumann_force * x_neumann_force + y_neumann_force * y_neumann_force)
                                                               + sqrt(x_damping_force * x_damping_force + y_damping_force * y_damping_force)
-                                                              + sqrt(x_alid_force * x_alid_force + y_alid_force * y_alid_force)) ;
+                                                              + sqrt(x_alid_force * x_alid_force + y_alid_force * y_alid_force)) ;*/
 }
 
 void Node::Apply_Newton()
@@ -292,7 +292,8 @@ void Node::Compute_error(double& total_error, double& max_error, int& node_for_m
 void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, double Control_parameter_mass_scaling, double Max_mass_scaling,
                                 double Error_factor_mass_scaling, double Accepted_ratio, double Decrease_factor_mass_scaling, double& max_factor_mass_scaling, int index, int num_node, double& total_mass_mass_scaling)
 {
-    if (abs(x_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    // X AXIS MULTIPLICATIVE
+    /*if (abs(x_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
     {
         delta_x_factor_mass_scaling = pow((abs(x_error * inverse_distance_estimator) * Inv_Target_error / Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
         x_factor_mass_scaling *= delta_x_factor_mass_scaling ;
@@ -303,9 +304,24 @@ void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     {
         if (x_factor_mass_scaling != 1) x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
         if (x_factor_mass_scaling < 1) x_factor_mass_scaling = 1;
+    }*/
+
+    // X AXIS ADDITIVE
+    if (abs(x_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    {
+        delta_x_factor_mass_scaling = pow((abs(x_error * inverse_distance_estimator) - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+        x_factor_mass_scaling += delta_x_factor_mass_scaling ;
+        if (x_factor_mass_scaling > Max_mass_scaling)
+            x_factor_mass_scaling = Max_mass_scaling ;
+    }
+    else
+    {
+        if (x_factor_mass_scaling != 1) x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (x_factor_mass_scaling < 1) x_factor_mass_scaling = 1;
     }
 
-    if (abs(y_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    // Y AXIS MULTIPLICATIVE
+    /*if (abs(y_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
     {
         delta_y_factor_mass_scaling = pow((abs(y_error * inverse_distance_estimator) * Inv_Target_error / Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
         y_factor_mass_scaling *= delta_y_factor_mass_scaling ;
@@ -316,7 +332,22 @@ void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     {
         if (y_factor_mass_scaling != 1) y_factor_mass_scaling *= Decrease_factor_mass_scaling ;
         if (y_factor_mass_scaling < 1) y_factor_mass_scaling = 1;
+    }*/
+
+    // Y AXIS ADDITIVE
+    if (abs(y_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    {
+        delta_y_factor_mass_scaling = pow((abs(y_error * inverse_distance_estimator) - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+        y_factor_mass_scaling += delta_y_factor_mass_scaling ;
+        if (y_factor_mass_scaling > Max_mass_scaling)
+            y_factor_mass_scaling = Max_mass_scaling ;
     }
+    else
+    {
+        if (y_factor_mass_scaling != 1) y_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (y_factor_mass_scaling < 1) y_factor_mass_scaling = 1;
+    }
+
 
     factor_mass_scaling = (x_factor_mass_scaling + y_factor_mass_scaling) * 0.5 ;
 

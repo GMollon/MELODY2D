@@ -8,3 +8,7 @@
 *.o
 *.m
 *.layout
+*.txt
+*.sh
+*.1
+*.slurm
