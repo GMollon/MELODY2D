@@ -336,7 +336,7 @@ void Solver_step(
                 }
             }
 
-            cout <<"      MS " << max_mass << " -" << bodyformax << endl;
+            cout <<"      MS " << setprecision(15) <<max_mass << " -" << bodyformax << endl;
 
         }
 

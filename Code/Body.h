@@ -2410,7 +2410,7 @@ void Body::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     else if (type == "rigid")
     {
         // MULTIPLICATIVE
-        if (total_error >= Target_error * Error_factor_mass_scaling)
+        /*if (total_error >= Target_error * Error_factor_mass_scaling)
         {
             delta_factor_mass_scaling = pow((total_error * Inv_Target_error / Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
             factor_mass_scaling *= delta_factor_mass_scaling ;
@@ -2423,7 +2423,7 @@ void Body::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
                 factor_mass_scaling *= Decrease_factor_mass_scaling ;
             if(factor_mass_scaling < 1)
                 factor_mass_scaling = 1;
-        }
+        }*/
 
         //ADDITIVE
         if (total_error >= Target_error * Error_factor_mass_scaling)

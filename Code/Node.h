@@ -313,12 +313,14 @@ void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
         x_factor_mass_scaling += delta_x_factor_mass_scaling ;
         if (x_factor_mass_scaling > Max_mass_scaling)
             x_factor_mass_scaling = Max_mass_scaling ;
+        //cout << "error  : "  << x_error << " " << delta_x_factor_mass_scaling << " " << x_factor_mass_scaling << endl ;
     }
     else
     {
         if (x_factor_mass_scaling != 1) x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
         if (x_factor_mass_scaling < 1) x_factor_mass_scaling = 1;
     }
+
 
     // Y AXIS MULTIPLICATIVE
     /*if (abs(y_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
