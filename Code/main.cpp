@@ -31,7 +31,7 @@ main(int argc, char **argv)
 	cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                     Main Program                      %%" << endl ;
-	cout << "%%           Version 3.87 ; 23rd of May 2019             %%" << endl ;
+	cout << "%%         Version 3.90 ; 13th of November 2019          %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
@@ -72,9 +72,9 @@ main(int argc, char **argv)
 	double max_error , mean_error ;
     int Nb_regions = 0 ;
 	vector<vector<int>> Regions ;
-	vector<int> flags(9) ;
+	vector<int> flags(11) ;
 	int flag_failure = 0 ;
-	vector<int> To_Plot(32) ;
+	vector<int> To_Plot(39) ;
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //
@@ -100,14 +100,15 @@ main(int argc, char **argv)
 	// INITIALIZATION //
 	if (flags[7]==0) cout << "Initializing" << endl ;
 	for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_borders(Xmin_period , Xmax_period) ;
-	Update_proximity(Nb_bodies , Bodies , Xmin_period , Xmax_period) ;
-	if (flags[3]==1) Initialize_CZM( Nb_bodies , Bodies , Nb_contact_laws , Contact_laws , flags , Xmin_period , Xmax_period ) ;
-    cout << "Updating Material Properties" << endl ;
+	for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_bc(Time) ;
     #pragma omp parallel
     {
         #pragma omp for schedule(dynamic)
         for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_material( Nb_materials , Materials , flags ) ;
     }
+    Update_proximity(Nb_bodies , Bodies , Xmin_period , Xmax_period , flags) ;
+	if (flags[3]==1) Initialize_CZM( Nb_bodies , Bodies , Nb_contact_laws , Contact_laws , flags , Xmin_period , Xmax_period ) ;
+    cout << "Updating Material Properties" << endl ;
 	for (int i=0 ; i<Nb_spies ; i++) Spies[i].next_time += Time ;
 	vector<vector<vector<double>>> spying(Nb_spies) ;
 
@@ -121,11 +122,10 @@ main(int argc, char **argv)
 		Number_iteration++ ;            // SEQUENTIAL //
 		if ( Solver == "Euler" )
 		{
-			Euler_step(Nb_bodies , Bodies , Nb_materials ,
-				Materials , Nb_contact_laws , Contact_laws , Contacts_Table ,
-				Tend , Xmin_period , Xmax_period , Penalty ,
-				Xgravity , Ygravity ,
-				Time, Deltat , Number_iteration) ;
+			Euler_step(Nb_bodies , Bodies , Nb_regions , Regions ,
+                Nb_materials , Materials , Nb_contact_laws , Contact_laws , Contacts_Table ,
+                Tend , Xmin_period , Xmax_period , Penalty , Xgravity , Ygravity ,
+                Time , Deltat , Number_iteration , flags) ;
 		}
 		else if ( Solver == "Adaptive_Euler" )
 		{
@@ -145,12 +145,12 @@ main(int argc, char **argv)
                                     monitoring , Nb_monitored , Monitored) ;            // SEQUENTIAL //
         Spying(Nb_bodies , Bodies ,
             Time , Deltat , Number_iteration ,
-            spying , Nb_spies , Spies) ;                                                // SEQUENTIAL //
+            spying , Nb_spies , Spies , Xmin_period , Xmax_period) ;                                                // SEQUENTIAL //
         //cout << "45" << endl ;
 		if ( Time > Next_contact_update-1.e-6*Deltat )                                  // SEQUENTIAL //
 		{
 			Next_contact_update = Next_contact_update + Contact_update_period ;
-			Update_proximity(Nb_bodies , Bodies , Xmin_period , Xmax_period) ;
+			Update_proximity(Nb_bodies , Bodies , Xmin_period , Xmax_period , flags) ;
 			Update_status(Nb_bodies , Bodies , Nb_deactivated , Deactivated) ;        // SEQUENTIAL //
 		}
 		//cout << "46" << endl ;

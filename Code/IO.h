@@ -16,6 +16,7 @@ void Read_spy_line(
 	double b ;
 	double bo ;
 	double n ;
+	double xmin , xmax , ymin , ymax ;
     Static_Control_file >> Keyword ;
     if (Keyword == "Position")
     {
@@ -498,6 +499,14 @@ void Read_spy_line(
             New_Read = { 10 , 6 , b } ;
         }
     }
+    else if (Keyword == "Polar")
+    {
+        Static_Control_file >> Keyword >> n >> xmin >> xmax >> ymin >> ymax ;
+        if (Keyword == "Contact_Normal")
+        {
+            New_Read = { 11 , 0 , n , xmin , xmax , ymin , ymax } ;
+        }
+    }
 }
 
 
@@ -836,7 +845,7 @@ void Load_static(
         if (line.substr(0,7)=="GRAPHIC")
         {
             int j ;
-			for (int i(0) ; i < 32 ; i++)
+			for (int i(0) ; i < 39 ; i++)
 			{
                 Static_Control_file >> j >> token ;
                 getline(Static_Control_file, token) ;
@@ -1728,7 +1737,8 @@ void Load_dynamic(
 	string status ;
 	while(getline(Dynamic_file, line))
 	{
-        cout << line << endl ;
+        if( flags[7] == 0 ) cout << line << endl ;
+
         if (line.substr(0,13)=="KILL_VELOCITY")             flags[0] = 1 ;
         if (line.substr(0,14)=="MONITOR_ENERGY")            flags[1] = 1 ;
         if (line.substr(0,18)=="MONITOR_BOUNDARIES")        flags[2] = 1 ;
@@ -1738,6 +1748,8 @@ void Load_dynamic(
         if (line.substr(0,21)=="UPDATE_DAMPING_MATRIX")     flags[6] = 1 ;
         if (line.substr(0,6) =="NO_LOG")                    flags[7] = 1 ;
         if (line.substr(0,13)=="NO_MONITORING")             flags[8] = 1 ;
+        if (line.substr(0,15)=="NO_SELF_CONTACT")           flags[9] = 1 ;
+        if (line.substr(0,10)=="RESET_WORK")                flags[10] = 1 ;
 
 		if (line.substr(0,6)=="SOLVER")
 		{
@@ -1759,7 +1771,7 @@ void Load_dynamic(
 			getline(Dynamic_file, token) ;
 			Dynamic_file >> index_body ;
 			getline(Dynamic_file, token) ;
-			cout << "Deformable " << index_body << endl ;
+			if( flags[7] == 0 ) cout << "Deformable " << index_body << endl ;
 			Bodies[index_body].status = status ;
 		    flag_body_rigid = 0 ;
 		}
@@ -1770,7 +1782,7 @@ void Load_dynamic(
 			getline(Dynamic_file, token) ;
 			Dynamic_file >> index_body ;
 			getline(Dynamic_file, token) ;
-			cout << "Rigid " << index_body << endl ;
+			if( flags[7] == 0 ) cout << "Rigid " << index_body << endl ;
 			Bodies[index_body].status = status ;
 		    flag_body_rigid = 1 ;
 		}
@@ -1938,13 +1950,26 @@ void Load_dynamic(
 			double w0 , w1 , w2 , w3 , w4 , w5 , w6 ;
             Dynamic_file >> w0 >> w1 >> w2 >> w3 >> w4 >> w5 >> w6 ;
             getline(Dynamic_file, token) ;
-            Bodies[index_body].internal_work = w0 ;
-            Bodies[index_body].contact_work = w1 ;
-            Bodies[index_body].body_work = w2 ;
-            Bodies[index_body].dirichlet_work = w3 ;
-            Bodies[index_body].neumann_work = w4 ;
-            Bodies[index_body].damping_work = w5 ;
-            Bodies[index_body].alid_work = w6 ;
+            if ( flags[10] == 0 )
+            {
+                Bodies[index_body].internal_work = w0 ;
+                Bodies[index_body].contact_work = w1 ;
+                Bodies[index_body].body_work = w2 ;
+                Bodies[index_body].dirichlet_work = w3 ;
+                Bodies[index_body].neumann_work = w4 ;
+                Bodies[index_body].damping_work = w5 ;
+                Bodies[index_body].alid_work = w6 ;
+            }
+            else
+            {
+                Bodies[index_body].internal_work = 0. ;
+                Bodies[index_body].contact_work = 0. ;
+                Bodies[index_body].body_work = 0. ;
+                Bodies[index_body].dirichlet_work = 0. ;
+                Bodies[index_body].neumann_work = 0. ;
+                Bodies[index_body].damping_work = 0. ;
+                Bodies[index_body].alid_work = 0. ;
+            }
 		//cout << "Neighbours" << endl ;
 		}
 
@@ -2175,8 +2200,8 @@ void Write_dynamic(
 
 	Dynamic_file << "SOLVER" << endl ;
 	Dynamic_file << Solver << endl ;
-	Dynamic_file << setprecision (10) << Number_save << ' ' << Number_iteration << ' ' << Time << ' ' << Number_print << endl ;
-	Dynamic_file << Deltat << endl ;
+	Dynamic_file << setprecision (16) << Number_save << ' ' << Number_iteration << ' ' << Time << ' ' << Number_print << endl ;
+	Dynamic_file << setprecision (10) << Deltat << endl ;
 	Dynamic_file << Next_save << ' ' << Next_print << ' ' << Next_contact_update << endl ;
 	Dynamic_file << endl ;
 
@@ -2187,6 +2212,7 @@ void Write_dynamic(
 	if (flags[6]==1) Dynamic_file << "UPDATE_DAMPING_MATRIX" << endl ;
 	if (flags[7]==1) Dynamic_file << "NO_LOG" << endl ;
 	if (flags[8]==1) Dynamic_file << "NO_MONITORING" << endl ;
+	if (flags[9]==1) Dynamic_file << "NO_SELF_CONTACT" << endl ;
 
 	Dynamic_file << endl ;
 

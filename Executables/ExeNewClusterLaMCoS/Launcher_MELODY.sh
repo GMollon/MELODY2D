@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J Micro_6
+#SBATCH -J Simulation_Name
 #SBATCH --account=lamcos-tmi-calc
 #SBATCH --partition=medium
 #SBATCH --time='48:00:00'
@@ -17,4 +17,4 @@ echo "Running on $SLURM_NNODES nodes."
 echo "Running on $SLURM_NPROCS processors."
 
 export OMP_NUM_THREAD=24
-./MELODY_2D_3.87 0
+./MELODY_2D_3.89 0

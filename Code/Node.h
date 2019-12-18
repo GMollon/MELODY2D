@@ -42,8 +42,8 @@ class Node
 	vector<double> y_regions_internal_forces ;
 	double x_contact_force ;
 	double y_contact_force ;
-	vector<double> x_master_contact_forces ;
-	vector<double> y_master_contact_forces ;
+	//vector<double> x_master_contact_forces ;
+	//vector<double> y_master_contact_forces ;
 	double x_self_contact_force ;
 	double y_self_contact_force ;
 	double x_body_force ;
@@ -141,8 +141,8 @@ Node::Node (double x, double y, double d, double mx, double my, double imx, doub
 	y_regions_internal_forces = {0.} ;
 	x_contact_force = 0. ;
 	y_contact_force = 0. ;
-	x_master_contact_forces = {0.} ;
-	y_master_contact_forces = {0.} ;
+	//x_master_contact_forces = {0.} ;
+	//y_master_contact_forces = {0.} ;
 	x_self_contact_force = 0. ;
 	y_self_contact_force = 0. ;
 	x_body_force = 0. ;
@@ -201,13 +201,13 @@ void Node::Sum_up_forces()
         x_regions_internal_forces[i] = 0. ;
         y_regions_internal_forces[i] = 0. ;
     }
-	for (int i(0) ; i<(int)x_master_contact_forces.size() ; i++)
-    {
-        x_contact_force += x_master_contact_forces[i] ;
-        y_contact_force += y_master_contact_forces[i] ;
-        x_master_contact_forces[i] = 0. ;
-        y_master_contact_forces[i] = 0. ;
-    }
+	//for (int i(0) ; i<(int)x_master_contact_forces.size() ; i++)
+    //{
+    //    x_contact_force += x_master_contact_forces[i] ;
+    //    y_contact_force += y_master_contact_forces[i] ;
+    //    x_master_contact_forces[i] = 0. ;
+    //    y_master_contact_forces[i] = 0. ;
+    //}
 	x_force = x_internal_force + x_contact_force + x_self_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force + x_alid_force ;
 	y_force = y_internal_force + y_contact_force + y_self_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force + y_alid_force ;
 }

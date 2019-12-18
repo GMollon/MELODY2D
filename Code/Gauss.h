@@ -6,7 +6,7 @@
 class Gauss
 {
 	public :
-	
+
 	// Static attributes
 	double x_gauss ;
 	double y_gauss ;
@@ -17,15 +17,15 @@ class Gauss
 	vector<double> shape_functions ;
 	vector<double> shape_xderiv ;
 	vector<double> shape_yderiv ;
-	
+
 	// Constructor and Destructor
 	Gauss(double x, double y, double w, double j, int n) ;
 	~Gauss() ;
-	
+
 	// Accessors
-	
+
 	// Modifiers
-	
+
 	// Methods
 } ;
 
