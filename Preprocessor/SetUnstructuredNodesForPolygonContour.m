@@ -56,22 +56,22 @@ end
 % Position the field nodes and triangulate
 Box=[min(Contour(:,1)),min(Contour(:,2));max(Contour(:,1)),max(Contour(:,2))];
 %
-xc=mean(Contour(:,1));
-yc=mean(Contour(:,2));
+%xc=mean(Contour(:,1));
+%yc=mean(Contour(:,2));
 %xc=0;yc=0.02;
 %
-rmax=max(((Contour(:,1)-xc).^2+(Contour(:,2)-yc).^2).^0.5);
-pmin=0;
-pmax=rmax;
-fmin=Average_Nodal_Distance*Mesh_Ratio(1);
-fmax=Average_Nodal_Distance*Mesh_Ratio(2);
-a=(fmax-fmin)/rmax;
-b=fmin;
+%rmax=max(((Contour(:,1)-xc).^2+(Contour(:,2)-yc).^2).^0.5);
+%pmin=0;
+%pmax=rmax;
+%fmin=Average_Nodal_Distance*Mesh_Ratio(1);
+%fmax=Average_Nodal_Distance*Mesh_Ratio(2);
+%a=(fmax-fmin)/rmax;
+%b=fmin;
 %fh=@(p) b+a*((p(:,1)-xc).^2+(p(:,2)-yc).^2).^0.5;
 %fh=@(p) fmax-(fmin-fmax)/rmax*dpoly(p,Contour);
-fh=@(p) fmax*(1-0.4*dpoly(p,Contour)/fmax);
+fh=@(p) Average_Nodal_Distance*(1-Mesh_Ratio(1)*dpoly(p,Contour)/Average_Nodal_Distance);
 
-[INITIAL_POSITIONS,TRIANGULATION]=distmesh2d_plot(Activate_Plot,0.001,@dpoly,fh,Average_Nodal_Distance,Box,Contour,Contour)
+[INITIAL_POSITIONS,TRIANGULATION]=distmesh2d_plot(Activate_Plot,0.0001,@dpoly,fh,Average_Nodal_Distance,Box,Contour,Contour)
 %[INITIAL_POSITIONS,TRIANGULATION]=distmesh2d_plot(Activate_Plot,0.001,@dpoly,@huniform,Average_Nodal_Distance,Box,Contour,Contour);
 %close
 

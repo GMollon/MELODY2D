@@ -12,10 +12,12 @@ void Read_spy_line(
     vector<double>& New_Read,
     ifstream& Static_Control_file)
 {
-    string Keyword ;
-    double b ;
-    double bo ;
-    double n ;
+	string Keyword ;
+	double b ;
+	double bo ;
+	double n ;
+	double xmin , xmax , ymin , ymax ;
+
     Static_Control_file >> Keyword ;
     if (Keyword == "Position")
     {
@@ -576,6 +578,13 @@ void Read_spy_line(
             New_Read = { 12, 8, b, n } ;
         }
 
+    else if (Keyword == "Polar")
+    {
+        Static_Control_file >> Keyword >> n >> xmin >> xmax >> ymin >> ymax ;
+        if (Keyword == "Contact_Normal")
+        {
+            New_Read = { 11 , 0 , n , xmin , xmax , ymin , ymax } ;
+        }
     }
 }
 
@@ -707,96 +716,91 @@ void Load_static(
                 string length_evolution ;
                 Static_Control_file >> length_evolution ;
                 getline(Static_Control_file, token) ;
-                vector<double> parameters({0}) ;
-                if (type=="Frictionless")
-                {
-                    double p1 ;
-                    Static_Control_file >> p1 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="Cohesion")
-                {
-                    double p1, p2, p3, p4 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="MohrCoulomb")
-                {
-                    double p1, p2, p3, p4, p5 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="DampedMohrCoulomb")
-                {
-                    double p1, p2, p3, p4, p5, p6 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="TwoSlopesMohrCoulomb")
-                {
-                    double p1, p2, p3, p4, p5, p6 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="CZMlinear")
-                {
-                    double p1, p2, p3, p4, p5 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="CZMfatigue")
-                {
-                    double p1, p2, p3, p4, p5, p6, p7, p8 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                else if (type=="BondedMohrCoulomb")
-                {
-                    double p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 >> p10 ;
-                    getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9, p10}) ;
-                    Contact_law law ( i, material1, material2, type, length_evolution, parameters ) ;
-                    Contact_laws.push_back(law) ;
-                }
-                // OTHER LAWS ?
-                getline(Static_Control_file, token) ;
-            }
-            vector<int> c(Nb_materials) ;
-            for (int i=0 ; i<Nb_materials ; i++)
-                c[i] = -1 ;
-            for (int i=0 ; i<Nb_materials ; i++)
-                Contacts_Table.push_back(c) ;//Contacts_Table[i] = c ;
-            int nn, pp ;
-            for (int i=0 ; i<Nb_contact_laws ; i++)
+				vector<double> parameters({0}) ;
+				if (type=="Frictionless")
+				{
+					double p1 ;
+					Static_Control_file >> p1 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="Cohesion")
+				{
+					double p1, p2, p3, p4 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="MohrCoulomb")
+				{
+					double p1, p2, p3, p4, p5 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="DampedMohrCoulomb")
+				{
+					double p1, p2, p3, p4, p5, p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+					cout << "damp " << p6 << endl ;
+				}
+				else if (type=="TwoSlopesMohrCoulomb")
+				{
+					double p1, p2, p3, p4, p5, p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="CZMlinear")
+				{
+					double p1, p2, p3, p4, p5, p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="CZMfatigue")
+				{
+					double p1, p2, p3, p4, p5, p6, p7, p8, p9 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				else if (type=="BondedMohrCoulomb")
+				{
+					double p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 >> p7 >> p8 >> p9 >> p10 >> p11 ;
+					getline(Static_Control_file, token) ;
+					vector<double> parameters({p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11}) ;
+					Contact_law law ( i , material1 , material2 , type , length_evolution , parameters ) ;
+					Contact_laws.push_back(law) ;
+				}
+				// OTHER LAWS ?
+				getline(Static_Control_file, token) ;
+			}
+			vector<int> c(Nb_materials) ;
+			for (int i=0 ; i<Nb_materials ; i++) c[i] = -1 ;
+			for (int i=0 ; i<Nb_materials ; i++) Contacts_Table.push_back(c) ;//Contacts_Table[i] = c ;
+			int nn , pp ;
+			for (int i=0 ; i<Nb_contact_laws ; i++)
             {
-                for (int n(0) ; n<Nb_materials ; n++)
-                    if (Materials[n].name == Contact_laws[i].material1 )
-                        nn = n ;
-                for (int p(0) ; p<Nb_materials ; p++)
-                    if (Materials[p].name == Contact_laws[i].material2 )
-                        pp = p ;
+                for (int n(0) ; n<Nb_materials ; n++) if (Materials[n].name == Contact_laws[i].material1 ) nn = n ;
+                for (int p(0) ; p<Nb_materials ; p++) if (Materials[p].name == Contact_laws[i].material2 ) pp = p ;
                 Contacts_Table[nn][pp] = i ;
                 Contacts_Table[pp][nn] = i ;
             }
@@ -989,8 +993,9 @@ void Load_static(
         if (line.substr(0,7)=="GRAPHIC")
         {
             int j ;
-            for (int i(0) ; i < 34 ; i++)
-            {
+
+			for (int i(0) ; i < 40 ; i++)
+			{
                 Static_Control_file >> j >> token ;
                 getline(Static_Control_file, token) ;
                 To_Plot[i] = j ;
@@ -1912,6 +1917,11 @@ void Load_dynamic(
             flags[7] = 1 ;
         if (line.substr(0,13)=="NO_MONITORING")
             flags[8] = 1 ;
+        if (line.substr(0,15)=="NO_SELF_CONTACT")
+            flags[9] = 1 ;
+        if (line.substr(0,10)=="RESET_WORK")
+            flags[10] = 1 ;
+
 
         if (line.substr(0,6)=="SOLVER")
         {
@@ -2030,9 +2040,9 @@ void Load_dynamic(
             //cout << "Kinematics" << endl ;
         }
 
-        if (line.substr(0,10)=="FORCES")
-        {
-            if (flag_body_rigid==0)
+		if (line.substr(0,6)=="FORCES")
+		{
+		    if (flag_body_rigid==0)
             {
                 int j ;
                 double x_internal_force, y_internal_force ;
@@ -2112,36 +2122,49 @@ void Load_dynamic(
             double w0, w1, w2, w3, w4, w5, w6 ;
             Dynamic_file >> w0 >> w1 >> w2 >> w3 >> w4 >> w5 >> w6 ;
             getline(Dynamic_file, token) ;
-            Bodies[index_body].internal_work = w0 ;
-            Bodies[index_body].contact_work = w1 ;
-            Bodies[index_body].body_work = w2 ;
-            Bodies[index_body].dirichlet_work = w3 ;
-            Bodies[index_body].neumann_work = w4 ;
-            Bodies[index_body].damping_work = w5 ;
-            Bodies[index_body].alid_work = w6 ;
-            //cout << "Neighbours" << endl ;
-        }
-
-        if (line.substr(0,10)=="NEIGHBOURS")
-        {
-            int nb_neighbours ;
-            Dynamic_file >> nb_neighbours ;
-            getline(Dynamic_file, token) ;
-            vector<vector<int>> neighbours ;
-            int n1, n2, n3 ;
-            for (int i(0) ; i < nb_neighbours ; i++)
+            if ( flags[10] == 0 )
             {
-                Dynamic_file >> n1 >> n2 >> n3 ;
-                getline(Dynamic_file, token) ;
-                neighbours.push_back(vector<int>( {n1, n2, n3} )) ;
+                Bodies[index_body].internal_work = w0 ;
+                Bodies[index_body].contact_work = w1 ;
+                Bodies[index_body].body_work = w2 ;
+                Bodies[index_body].dirichlet_work = w3 ;
+                Bodies[index_body].neumann_work = w4 ;
+                Bodies[index_body].damping_work = w5 ;
+                Bodies[index_body].alid_work = w6 ;
             }
+            else
+            {
+                Bodies[index_body].internal_work = 0. ;
+                Bodies[index_body].contact_work = 0. ;
+                Bodies[index_body].body_work = 0. ;
+                Bodies[index_body].dirichlet_work = 0. ;
+                Bodies[index_body].neumann_work = 0. ;
+                Bodies[index_body].damping_work = 0. ;
+                Bodies[index_body].alid_work = 0. ;
+            }
+		//cout << "Neighbours" << endl ;
+		}
+
+		if (line.substr(0,10)=="NEIGHBOURS")
+		{
+			int nb_neighbours ;
+			Dynamic_file >> nb_neighbours ;
+			getline(Dynamic_file, token) ;
+			vector<vector<int>> neighbours ;
+			int n1 , n2 , n3 ;
+			for (int i(0) ; i < nb_neighbours ; i++)
+			{
+				Dynamic_file >> n1 >> n2 >> n3 ;
+				getline(Dynamic_file, token) ;
+				neighbours.push_back(vector<int>( {n1 , n2 , n3} )) ;
+			}
             Bodies[index_body].nb_neighbours=nb_neighbours ;
             Bodies[index_body].neighbours=neighbours ;
             //cout << "Neighbours" << endl ;
         }
 
-        if (line.substr(0,8)=="BORDERS")
-        {
+		if (line.substr(0,7)=="BORDERS")
+		{
             for (int i(0) ; i < Bodies[index_body].nb_borders ; i++)
             {
                 getline(Dynamic_file, token) ;
@@ -2328,62 +2351,50 @@ void Write_dynamic(
     vector<Body>& Bodies,
     vector<int>& flags )
 {
-    if (flags[7]==0)
-        cout << "Writing dynamic data of file " << Number_save << endl ;
-    string filename ;
+	if (flags[7]==0) cout << "Writing dynamic data of file " << Number_save << endl ;
+	string filename ;
 
-    stringstream sfilename ;
-    sfilename << Number_save;
-    if      (Number_save<10)
-        filename="DYNAMIC_0000"+sfilename.str()+".asc" ;
-    else if (Number_save<100)
-        filename="DYNAMIC_000"+sfilename.str()+".asc" ;
-    else if (Number_save<1000)
-        filename="DYNAMIC_00"+sfilename.str()+".asc" ;
-    else if (Number_save<10000)
-        filename="DYNAMIC_0"+sfilename.str()+".asc" ;
-    else if (Number_save<100000)
-        filename="DYNAMIC_"+sfilename.str()+".asc" ;
-    ofstream Dynamic_file (filename) ;
-    Dynamic_file << endl ;
-    Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
-    Dynamic_file << "%%%%%%%          GENERAL DATA          %%%%%%%" << endl ;
-    Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
-    Dynamic_file << endl ;
+	stringstream sfilename ;
+	sfilename << Number_save;
+	if      (Number_save<10) filename="DYNAMIC_0000"+sfilename.str()+".asc" ;
+	else if (Number_save<100) filename="DYNAMIC_000"+sfilename.str()+".asc" ;
+	else if (Number_save<1000) filename="DYNAMIC_00"+sfilename.str()+".asc" ;
+	else if (Number_save<10000) filename="DYNAMIC_0"+sfilename.str()+".asc" ;
+	else if (Number_save<100000) filename="DYNAMIC_"+sfilename.str()+".asc" ;
+	ofstream Dynamic_file (filename) ;
+	Dynamic_file << endl ;
+	Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
+	Dynamic_file << "%%%%%%%          GENERAL DATA          %%%%%%%" << endl ;
+	Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
+	Dynamic_file << endl ;
 
-    Dynamic_file << "SIMULATION_NAME" << endl ;
-    Dynamic_file << Simulation_name << endl ;
-    Dynamic_file << endl ;
+	Dynamic_file << "SIMULATION_NAME" << endl ;
+	Dynamic_file << Simulation_name << endl ;
+	Dynamic_file << endl ;
 
-    Dynamic_file << "SOLVER" << endl ;
-    Dynamic_file << Solver << endl ;
-    Dynamic_file << setprecision (10) << Number_save << ' ' << Number_iteration << ' ' << Time << ' ' << Number_print << endl ;
-    Dynamic_file << Deltat << endl ;
-    Dynamic_file << Next_save << ' ' << Next_print << ' ' << Next_contact_update << endl ;
-    Dynamic_file << endl ;
+	Dynamic_file << "SOLVER" << endl ;
+	Dynamic_file << Solver << endl ;
+	Dynamic_file << setprecision (16) << Number_save << ' ' << Number_iteration << ' ' << Time << ' ' << Number_print << endl ;
+	Dynamic_file << setprecision (10) << Deltat << endl ;
+	Dynamic_file << Next_save << ' ' << Next_print << ' ' << Next_contact_update << endl ;
+	Dynamic_file << endl ;
 
-    if (flags[1]==1)
-        Dynamic_file << "MONITOR_ENERGY" << endl ;
-    if (flags[2]==1)
-        Dynamic_file << "MONITOR_BOUNDARIES" << endl ;
-    if (flags[4]==1)
-        Dynamic_file << "UPDATE_MASS_MATRIX" << endl ;
-    if (flags[5]==1)
-        Dynamic_file << "UPDATE_STIFFNESS_MATRIX" << endl ;
-    if (flags[6]==1)
-        Dynamic_file << "UPDATE_DAMPING_MATRIX" << endl ;
-    if (flags[7]==1)
-        Dynamic_file << "NO_LOG" << endl ;
-    if (flags[8]==1)
-        Dynamic_file << "NO_MONITORING" << endl ;
+	if (flags[1]==1) Dynamic_file << "MONITOR_ENERGY" << endl ;
+	if (flags[2]==1) Dynamic_file << "MONITOR_BOUNDARIES" << endl ;
+	if (flags[4]==1) Dynamic_file << "UPDATE_MASS_MATRIX" << endl ;
+	if (flags[5]==1) Dynamic_file << "UPDATE_STIFFNESS_MATRIX" << endl ;
+	if (flags[6]==1) Dynamic_file << "UPDATE_DAMPING_MATRIX" << endl ;
+	if (flags[7]==1) Dynamic_file << "NO_LOG" << endl ;
+	if (flags[8]==1) Dynamic_file << "NO_MONITORING" << endl ;
+	if (flags[9]==1) Dynamic_file << "NO_SELF_CONTACT" << endl ;
 
-    Dynamic_file << endl ;
+	Dynamic_file << endl ;
 
-    for (int i(0) ; i<Nb_bodies ; i++)
-    {
-        Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
-        Dynamic_file << "%%%%%%%             BODY " << i << "             %%%%%%%" << endl ;
-        Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
+	for (int i(0) ; i<Nb_bodies ; i++)
+	{
+		Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
+		Dynamic_file << "%%%%%%%             BODY " << i << "             %%%%%%%" << endl ;
+		Dynamic_file << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl ;
         Dynamic_file << endl ;
 
         if (Bodies[i].type=="deformable")

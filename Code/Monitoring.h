@@ -564,14 +564,16 @@ void Monitoring(int Nb_bodies,
 //** SPYING **********************************//
 //********************************************//
 
-void Spying(int Nb_bodies,
-            vector<Body>& Bodies,
-            double Time,
-            double& Deltat,
-            int& Number_iteration,
-            vector<vector<vector<double>>>& spying,
-            int& Nb_spies,
-            vector<Spy>& Spies)
+void Spying(int Nb_bodies ,
+	vector<Body>& Bodies ,
+	double Time ,
+	double& Deltat ,
+	int& Number_iteration ,
+    vector<vector<vector<double>>>& spying ,
+    int& Nb_spies ,
+    vector<Spy>& Spies ,
+    double Xmin_period ,
+    double Xmax_period)
 {
     for (int n(0) ; n < Nb_spies ; n++)
     {
@@ -1630,6 +1632,39 @@ void Spying(int Nb_bodies,
                     current_monitoring.push_back(mass_y) ;
                 else if (Monitored[i][1] == 8)
                     current_monitoring.push_back(mass_tot) ;
+            }
+            else if (Monitored[i][0] == 11)
+            {
+                int n = Monitored[i][2] ;
+                double interval = 3.141592653589793 / n ;
+                vector<double> Bins(n) ;
+                int inbin , nc ;
+                double period = Xmax_period - Xmin_period ;
+                double angle , fx , fy , xs , ys ;
+                nc = 0 ;
+                for (int k=0 ; k<n ; k++)   Bins[k] = 0. ;
+                for (int k=0 ; k<Nb_bodies ; k++)
+                {
+                    if (Bodies[k].status == "inactive") continue ;
+                    xs = Bodies[k].x_current - period * floor( ( Bodies[k].x_current - Xmin_period ) / period ) ; ;
+                    ys = Bodies[k].y_current ;
+                    if ((xs<Monitored[i][3]) || (xs>Monitored[i][4]) || (xs<Monitored[i][5]) || (xs>Monitored[i][6])) continue ;
+                    for (int j=0 ; j<Bodies[k].nb_contact_elements ; j++)
+                    {
+                        fx = Bodies[k].contact_elements[j].fx ;
+                        fy = Bodies[k].contact_elements[j].fy ;
+                        if ((fx == 0.) && (fy == 0.))   continue ;
+                        nc++ ;
+                        angle = atan(Bodies[k].contact_elements[j].ynorm/Bodies[k].contact_elements[j].xnorm) ;
+                        if (angle<0.)   angle = angle + 3.141592653589793 ;
+                        inbin = (int) floor(angle / interval) ;
+                        Bins[inbin] = Bins[inbin] + 1. ;
+                    }
+                }
+                for (int k=0 ; k<n ; k++)
+                {
+                    current_monitoring.push_back(n*Bins[k]/nc) ;
+                }
             }
         }
         spying[n].push_back(current_monitoring) ;

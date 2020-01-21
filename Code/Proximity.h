@@ -7,11 +7,26 @@
 
 int Detect_Segment_Proximity(double Xs, double Ys, double X1, double Y1, double X2, double Y2, double detection_distance)
 {
-    if ((Xs-X1) * (Xs-X1) + (Ys-Y1) * (Ys-Y1) < detection_distance * detection_distance)
-        return 1 ;
-    if ((Xs-X2) * (Xs-X2) + (Ys-Y2) * (Ys-Y2) < detection_distance * detection_distance)
-        return 1 ;
-    double Xsi = -1. + 2. * ( (X2-X1) * (Xs-X1) + (Y2-Y1) * (Ys-Y1) ) / ((X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1)) ;
+    // OPTIMIZED
+    detection_distance = detection_distance * detection_distance ;
+    if ((Xs-X1) * (Xs-X1) + (Ys-Y1) * (Ys-Y1) < detection_distance) return 1 ;
+    if ((Xs-X2) * (Xs-X2) + (Ys-Y2) * (Ys-Y2) < detection_distance) return 1 ;
+    double dx = X2-X1 ;
+    double dy = Y2-Y1 ;
+    double a = dx * dx + dy * dy ;
+    double Xsi = -1. + 2. * ( dx * (Xs-X1) + dy * (Ys-Y1) ) / a ;
+    if ( (Xsi<1.) && (Xsi>-1.) )
+    {
+        double b = dy * ( Xs - 0.5 * (X1+X2) - Xsi * 0.5 * dx ) - dx * ( Ys - 0.5 * (Y1+Y2) - Xsi * 0.5 * dy ) ;
+        if (b * b < a * detection_distance) return 1 ;
+    }
+    return 0 ;
+}
+/*
+{
+    if ((Xs-X1) * (Xs-X1) + (Ys-Y1) * (Ys-Y1) < detection_distance * detection_distance) return 1 ;
+    if ((Xs-X2) * (Xs-X2) + (Ys-Y2) * (Ys-Y2) < detection_distance * detection_distance) return 1 ;
+    double Xsi = -1. + 2. * ( (X2-X1) * (Xs-X1) + (Y2-Y1) * (Ys-Y1) ) / ( (X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1) ) ;
     if ( (Xsi<1.) && (Xsi>-1.) )
     {
         if (abs((Y2-Y1)*(Xs-0.5*(X1+X2)-Xsi*0.5*(X2-X1))-(X2-X1)*(Ys-0.5*(Y1+Y2)-Xsi*0.5*(Y2-Y1)))<sqrt( (X2-X1) * (X2-X1) + (Y2-Y1) * (Y2-Y1) )*detection_distance)
@@ -19,6 +34,7 @@ int Detect_Segment_Proximity(double Xs, double Ys, double X1, double Y1, double 
     }
     return 0 ;
 }
+*/
 
 
 
@@ -27,20 +43,21 @@ int Detect_Segment_Proximity(double Xs, double Ys, double X1, double Y1, double 
 //********************************************//
 
 void Update_proximity(
-    int Nb_bodies,
-    vector<Body>& Bodies,
-    double Xmin_period,
-    double Xmax_period )
+	int Nb_bodies ,
+	vector<Body>& Bodies ,
+	double Xmin_period ,
+	double Xmax_period ,
+	vector<int>& flags )
 {
-    cout << endl ;
-    cout << "Updating proximities" << endl ;
-    double period = Xmax_period - Xmin_period ;
-    double invperiod = 1. / period ;
-    int flagok ;
+	//cout << endl ;
+	if( flags[7] == 0 ) cout << "Updating proximities" << endl ;
+	double period = Xmax_period - Xmin_period ;
+	double invperiod = 1. / period ;
+	int flagok ;
 
-    // Determining the spatial extension of each border of each body
-    #pragma omp parallel
-    {
+	// Determining the spatial extension of each border of each body
+	#pragma omp parallel
+	{
         #pragma omp for schedule(dynamic)
         for (int i=0 ; i<Nb_bodies ; i++)
         {
@@ -148,6 +165,7 @@ void Update_proximity(
         }
 
         // Initilizing master contact forces
+        /*
         #pragma omp for schedule(dynamic)
         for (int body=0 ; body<Nb_bodies ; body++)
         {
@@ -169,6 +187,7 @@ void Update_proximity(
                 Bodies[body].r_master_contact_forces = v ;
             }
         }
+        */
 
         // Computing local proximities
         #pragma omp for schedule(dynamic)
@@ -303,142 +322,141 @@ void Update_proximity(
         }
 
         // Computing self proximities
-        #pragma omp for schedule(dynamic)
-        for (int bodyS=0 ; bodyS<Nb_bodies ; bodyS++)
+        if ( flags[8] == 0 )
         {
-            if (Bodies[bodyS].type=="rigid" || Bodies[bodyS].periodicity=="Periodic")
-                continue ;
-            int flag_detect ;
-            int nb_border_nodesS, nb_border_nodesM ;
-            int flag_exists ;
-            int NodeS, NodeM0, NodeM1, NodeM2, NodeM3 ;
-            double Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3, N0, N1, N2, N3 ;
-            double Gapn, Xsi, Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest, length, effective_mass ;
-            vector<int> border_nodesS, NodesM0, NodesM1, NodesM2, NodesM3, Proximity_previous ;
-            vector<double> Xsis ;
-            vector<double> internal ;
-            string interpolantM ;
-            int nb_contact_elements = Bodies[bodyS].nb_contact_elements ;
-            Contact_element new_contact ;
-            vector<Contact_element> contact_elements = Bodies[bodyS].contact_elements ;
-            effective_mass = Bodies[bodyS].mass ;
-            for (int borderS(0) ; borderS<Bodies[bodyS].nb_borders ; borderS++)
+            #pragma omp for schedule(dynamic)
+            for (int bodyS=0 ; bodyS<Nb_bodies ; bodyS++)
             {
-                border_nodesS = Bodies[bodyS].borders[borderS].border_nodes ;
-                nb_border_nodesS=Bodies[bodyS].borders[borderS].number_border_nodes ;
-                for (int border_nodeS(0) ; border_nodeS<nb_border_nodesS ; border_nodeS++)
+                if (Bodies[bodyS].type=="rigid" || Bodies[bodyS].periodicity=="Periodic") continue ;
+                int flag_detect ;
+                int nb_border_nodesS , nb_border_nodesM , borderM , nb_internal ;
+                int flag_exists ;
+                int NodeS , NodeM0 , NodeM1 , NodeM2 , NodeM3 ;
+                double Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 , N0 , N1 , N2 , N3 ;
+                double Gapn , Gapt , Xsi , Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest , length , effective_mass ;
+                vector<int> border_nodesS , NodesM0 , NodesM1 , NodesM2 , NodesM3 , Proximity_previous ;
+                vector<double> Xsis ;
+                vector<double> internal ;
+                string interpolantM ;
+                int nb_contact_elements = Bodies[bodyS].nb_contact_elements ;
+                Contact_element new_contact ;
+                vector<Contact_element> contact_elements = Bodies[bodyS].contact_elements ;
+                effective_mass = Bodies[bodyS].mass ;
+                for (int borderS(0) ; borderS<Bodies[bodyS].nb_borders ; borderS++)
                 {
-                    NodeS = border_nodesS[border_nodeS] ;
-                    length = Bodies[bodyS].borders[borderS].length[border_nodeS] ;
-                    Xs = Bodies[bodyS].nodes[NodeS].x_current ;
-                    Ys = Bodies[bodyS].nodes[NodeS].y_current ;
-                    for (int borderM(0) ; borderM<Bodies[bodyS].nb_borders ; borderM++)
+                    border_nodesS = Bodies[bodyS].borders[borderS].border_nodes ;
+                    nb_border_nodesS=Bodies[bodyS].borders[borderS].number_border_nodes ;
+                    for (int border_nodeS(0) ; border_nodeS<nb_border_nodesS ; border_nodeS++)
                     {
-                        interpolantM = Bodies[bodyS].borders[borderM].interpolant ;
-                        NodesM0 = Bodies[bodyS].borders[borderM].node0 ;
-                        NodesM1 = Bodies[bodyS].borders[borderM].node1 ;
-                        NodesM2 = Bodies[bodyS].borders[borderM].node2 ;
-                        NodesM3 = Bodies[bodyS].borders[borderM].node3 ;
-                        nb_border_nodesM = Bodies[bodyS].borders[borderM].number_border_nodes ;
-                        for (int segmentM(0) ; segmentM<nb_border_nodesM-1 ; segmentM++)
+                        NodeS = border_nodesS[border_nodeS] ;
+                        length = Bodies[bodyS].borders[borderS].length[border_nodeS] ;
+                        Xs = Bodies[bodyS].nodes[NodeS].x_current ;
+                        Ys = Bodies[bodyS].nodes[NodeS].y_current ;
+                        for (int borderM(0) ; borderM<Bodies[bodyS].nb_borders ; borderM++)
                         {
-                            NodeM1 = NodesM1[segmentM] ;
-                            if (NodeM1==NodeS)
-                                continue ;
-                            X1 = Bodies[bodyS].nodes[NodeM1].x_current ;
-                            Y1 = Bodies[bodyS].nodes[NodeM1].y_current ;
-                            NodeM2 = NodesM2[segmentM] ;
-                            if (NodeM2==NodeS)
-                                continue ;
-                            X2 = Bodies[bodyS].nodes[NodeM2].x_current ;
-                            Y2 = Bodies[bodyS].nodes[NodeM2].y_current ;
-                            if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0)
-                                continue ;
-                            NodeM0 = NodesM0[segmentM] ;
-                            X0 = Bodies[bodyS].nodes[NodeM0].x_current ;
-                            Y0 = Bodies[bodyS].nodes[NodeM0].y_current ;
-                            NodeM3 = NodesM3[segmentM] ;
-                            X3 = Bodies[bodyS].nodes[NodeM3].x_current ;
-                            Y3 = Bodies[bodyS].nodes[NodeM3].y_current ;
-                            Xsi = 0. ;
-                            if (NodeM0==NodeS || NodeM3==NodeS)
+                            interpolantM = Bodies[bodyS].borders[borderM].interpolant ;
+                            NodesM0 = Bodies[bodyS].borders[borderM].node0 ;
+                            NodesM1 = Bodies[bodyS].borders[borderM].node1 ;
+                            NodesM2 = Bodies[bodyS].borders[borderM].node2 ;
+                            NodesM3 = Bodies[bodyS].borders[borderM].node3 ;
+                            nb_border_nodesM = Bodies[bodyS].borders[borderM].number_border_nodes ;
+                            for (int segmentM(0) ; segmentM<nb_border_nodesM-1 ; segmentM++)
                             {
-                                Closest_2_segment_self(Xs, Ys, X1, Y1, X2, Y2,
-                                                       1.e-16, Gapn, Xsi,
-                                                       Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest,
-                                                       N0, N1, N2, N3, flag_detect) ;
-                            }
-                            else
-                            {
-                                Closest_2_segment(interpolantM, Xs, Ys, X0, Y0, X1, Y1, X2, Y2, X3, Y3,
-                                                  1.e-16, Gapn, Xsi,
-                                                  Xnorm, Ynorm, Xtan, Ytan, Xclosest, Yclosest,
-                                                  N0, N1, N2, N3, flag_detect) ;
-                            }
-                            //if ( (-1.<=Xsi) && (Xsi<1.) && (Gapn>-Bodies[bodyS].contact_distance) )
-                            if ( flag_detect==0 && (Gapn>-Bodies[bodyS].contact_distance) )
-                            {
-                                flag_exists = 0 ;
-                                for (int k(0) ; k<Bodies[bodyS].nb_contact_elements ; k++)
+                                NodeM1 = NodesM1[segmentM] ;
+                                if (NodeM1==NodeS) continue ;
+                                X1 = Bodies[bodyS].nodes[NodeM1].x_current ;
+                                Y1 = Bodies[bodyS].nodes[NodeM1].y_current ;
+                                NodeM2 = NodesM2[segmentM] ;
+                                if (NodeM2==NodeS) continue ;
+                                X2 = Bodies[bodyS].nodes[NodeM2].x_current ;
+                                Y2 = Bodies[bodyS].nodes[NodeM2].y_current ;
+                                if (Detect_Segment_Proximity(Xs,Ys,X1,Y1,X2,Y2,Bodies[bodyS].detection_distance)==0) continue ;
+                                NodeM0 = NodesM0[segmentM] ;
+                                X0 = Bodies[bodyS].nodes[NodeM0].x_current ;
+                                Y0 = Bodies[bodyS].nodes[NodeM0].y_current ;
+                                NodeM3 = NodesM3[segmentM] ;
+                                X3 = Bodies[bodyS].nodes[NodeM3].x_current ;
+                                Y3 = Bodies[bodyS].nodes[NodeM3].y_current ;
+                                Xsi = 0. ;
+                                if (NodeM0==NodeS || NodeM3==NodeS)
                                 {
-                                    //if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
-                                    //    (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
-                                    //    (Bodies[bodyS].contact_elements[k].bodyM == bodyS))
-                                    if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
+                                    Closest_2_segment_self(Xs , Ys , X1 , Y1 , X2 , Y2 ,
+                                                          1.e-16 , Gapn , Xsi ,
+                                                          Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest ,
+                                                          N0 , N1 , N2 , N3 , flag_detect) ;
+                                }
+                                else
+                                {
+                                    Closest_2_segment(interpolantM , Xs , Ys , X0 , Y0 , X1 , Y1 , X2 , Y2 , X3 , Y3 ,
+                                                      1.e-16 , Gapn , Xsi ,
+                                                      Xnorm , Ynorm , Xtan , Ytan , Xclosest , Yclosest ,
+                                                      N0 , N1 , N2 , N3 , flag_detect) ;
+                                }
+                                //if ( (-1.<=Xsi) && (Xsi<1.) && (Gapn>-Bodies[bodyS].contact_distance) )
+                                if ( flag_detect==0 && (Gapn>-Bodies[bodyS].contact_distance) )
+                                {
+                                    flag_exists = 0 ;
+                                    for (int k(0) ; k<Bodies[bodyS].nb_contact_elements ; k++)
+                                    {
+                                        //if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
+                                        //    (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
+                                        //    (Bodies[bodyS].contact_elements[k].bodyM == bodyS))
+                                        if ((Bodies[bodyS].contact_elements[k].borderS == borderS) &&
                                             (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
                                             (Bodies[bodyS].contact_elements[k].bodyM == bodyS) &&
                                             (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
                                             (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1.))
-                                    {
-                                        new_contact = Bodies[bodyS].contact_elements[k] ;
-                                        flag_exists = 1 ;
-                                        break ;
+                                        {
+                                            new_contact = Bodies[bodyS].contact_elements[k] ;
+                                            flag_exists = 1 ;
+                                            break ;
+                                        }
                                     }
+                                    if (flag_exists == 0)
+                                    {
+                                        new_contact.borderS = borderS ;
+                                        new_contact.border_nodeS = border_nodeS ;
+                                        new_contact.nodeS = Bodies[bodyS].borders[borderS].border_nodes[border_nodeS] ;
+                                        new_contact.bodyM = bodyS ;
+                                        new_contact.borderM = borderM ;
+                                        new_contact.shiftM = 0 ;
+                                        new_contact.segmentM = segmentM ;
+                                        new_contact.nodeM0 = Bodies[bodyS].borders[borderM].node0[segmentM] ;
+                                        new_contact.shiftM0  = 0 ;
+                                        new_contact.shapeM0 = N0 ;
+                                        new_contact.nodeM1 = Bodies[bodyS].borders[borderM].node1[segmentM] ; ;
+                                        new_contact.shiftM1  = 0 ;
+                                        new_contact.shapeM1 = N1 ;
+                                        new_contact.nodeM2 = Bodies[bodyS].borders[borderM].node2[segmentM] ; ;
+                                        new_contact.shiftM2  = 0 ;
+                                        new_contact.shapeM2 = N2 ;
+                                        new_contact.nodeM3 = Bodies[bodyS].borders[borderM].node3[segmentM] ; ;
+                                        new_contact.shiftM3  = 0 ;
+                                        new_contact.shapeM3 = N3 ;
+                                        new_contact.gapn = Gapn ;
+                                        new_contact.gapt = 0. ;
+                                        new_contact.xsi = Xsi ;
+                                        new_contact.xnorm = Xnorm ;
+                                        new_contact.ynorm = Ynorm ;
+                                        new_contact.xtan = Xtan ;
+                                        new_contact.ytan = Ytan ;
+                                        new_contact.effective_mass = effective_mass ;
+                                        new_contact.length = length ;
+                                        new_contact.fx = 0. ;
+                                        new_contact.fy = 0. ;
+                                        new_contact.nb_internal = 0 ;
+                                        new_contact.internal = {0.} ;
+                                    }
+                                    contact_elements.push_back(new_contact) ;
+                                    nb_contact_elements++ ;
                                 }
-                                if (flag_exists == 0)
-                                {
-                                    new_contact.borderS = borderS ;
-                                    new_contact.border_nodeS = border_nodeS ;
-                                    new_contact.nodeS = Bodies[bodyS].borders[borderS].border_nodes[border_nodeS] ;
-                                    new_contact.bodyM = bodyS ;
-                                    new_contact.borderM = borderM ;
-                                    new_contact.shiftM = 0 ;
-                                    new_contact.segmentM = segmentM ;
-                                    new_contact.nodeM0 = Bodies[bodyS].borders[borderM].node0[segmentM] ;
-                                    new_contact.shiftM0  = 0 ;
-                                    new_contact.shapeM0 = N0 ;
-                                    new_contact.nodeM1 = Bodies[bodyS].borders[borderM].node1[segmentM] ; ;
-                                    new_contact.shiftM1  = 0 ;
-                                    new_contact.shapeM1 = N1 ;
-                                    new_contact.nodeM2 = Bodies[bodyS].borders[borderM].node2[segmentM] ; ;
-                                    new_contact.shiftM2  = 0 ;
-                                    new_contact.shapeM2 = N2 ;
-                                    new_contact.nodeM3 = Bodies[bodyS].borders[borderM].node3[segmentM] ; ;
-                                    new_contact.shiftM3  = 0 ;
-                                    new_contact.shapeM3 = N3 ;
-                                    new_contact.gapn = Gapn ;
-                                    new_contact.gapt = 0. ;
-                                    new_contact.xsi = Xsi ;
-                                    new_contact.xnorm = Xnorm ;
-                                    new_contact.ynorm = Ynorm ;
-                                    new_contact.xtan = Xtan ;
-                                    new_contact.ytan = Ytan ;
-                                    new_contact.effective_mass = effective_mass ;
-                                    new_contact.length = length ;
-                                    new_contact.fx = 0. ;
-                                    new_contact.fy = 0. ;
-                                    new_contact.nb_internal = 0 ;
-                                    new_contact.internal = {0.} ;
-                                }
-                                contact_elements.push_back(new_contact) ;
-                                nb_contact_elements++ ;
                             }
                         }
                     }
                 }
+                Bodies[bodyS].nb_contact_elements = nb_contact_elements ;
+                Bodies[bodyS].contact_elements = contact_elements ;
             }
-            Bodies[bodyS].nb_contact_elements = nb_contact_elements ;
-            Bodies[bodyS].contact_elements = contact_elements ;
         }
     }
 }
@@ -464,6 +482,7 @@ void Initialize_CZM(int Nb_bodies, vector<Body>& Bodies, int Nb_contact_laws, ve
             bodyM = Bodies[bodyS].contact_elements[icontact].bodyM ;
             material_nameM = Bodies[bodyM].material_name ;
             material_nameS = Bodies[bodyS].material_name ;
+            vector<double> parameters ;
             for (int i(0) ; i<Nb_contact_laws ; i++)
             {
                 material1 = Contact_laws[i].material1 ;
@@ -472,26 +491,32 @@ void Initialize_CZM(int Nb_bodies, vector<Body>& Bodies, int Nb_contact_laws, ve
                         ((material2==material_nameS) && (material1==material_nameM)))
                 {
                     contact_law_type = Contact_laws[i].type ;
+                    parameters = Contact_laws[i].parameters ;
                     break ;
                 }
             }
             if (contact_law_type=="CZMlinear")
             {
+                double gapinit = parameters[5] ;
                 Bodies[bodyS].contact_elements[icontact].nb_internal = 1 ;
-                //if ( abs( Bodies[bodyS].contact_elements[icontact].gapn) < 1.e-6 )   Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
-                //else                                                                 Bodies[bodyS].contact_elements[icontact].internal = {1.} ;
-                Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1.} ;
+            }
+            else if (contact_law_type=="CZMfatigue")
+            {
+                double gapinit = parameters[8] ;
+                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
+            }
+            else if (contact_law_type=="BondedMohrCoulomb")
+            {
+                double gapinit = parameters[10] ;
+                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
+                if ( Bodies[bodyS].contact_elements[icontact].gapn < gapinit )  Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
+                else                                                            Bodies[bodyS].contact_elements[icontact].internal = {1. , 0. , 0.} ;
             }
 
-            if (contact_law_type=="CZMfatigue" || contact_law_type=="BondedMohrCoulomb")
-            {
-                Bodies[bodyS].contact_elements[icontact].nb_internal = 3 ;
-                if ( abs( Bodies[bodyS].contact_elements[icontact].gapn ) < 1.e-6 )
-                    Bodies[bodyS].contact_elements[icontact].internal = {0., 0., 0.} ;
-                else
-                    Bodies[bodyS].contact_elements[icontact].internal = {1., 0., 0.} ;
-                //Bodies[bodyS].contact_elements[icontact].internal = {0. , 0. , 0.} ;
-            }
             // NB : other contact laws to initialize ?
         }
     }

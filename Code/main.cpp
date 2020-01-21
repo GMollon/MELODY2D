@@ -31,7 +31,7 @@ main(int argc, char **argv)
     cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                     Main Program                      %%" << endl ;
-    cout << "%%        Version 3.81 ; 12th of September 2018          %%" << endl ;
+    cout << "%%        Version 3.90 ; 12th of September 2018          %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
     cout << "%%                                                       %%" << endl ;
@@ -76,7 +76,7 @@ main(int argc, char **argv)
     vector<vector<int>> Regions ;
     vector<int> flags(9) ;
     int flag_failure = 0 ;
-    vector<int> To_Plot(34) ;
+    vector<int> To_Plot(40) ;
     vector<vector<int>> Contacts_Table ;
 
     // LOAD STATIC DATA //
@@ -105,10 +105,14 @@ main(int argc, char **argv)
         cout << "Initializing" << endl ;
     for (int i=0 ; i<Nb_bodies ; i++)
         Bodies[i].Update_borders(Xmin_period, Xmax_period) ;
+
+    for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_bc(Time) ;
+
     Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period) ;
     if (flags[3]==1)
         Initialize_CZM( Nb_bodies, Bodies, Nb_contact_laws, Contact_laws, flags, Xmin_period, Xmax_period ) ;
     cout << "Updating Material Properties" << endl ;
+
     #pragma omp parallel
     {
         #pragma omp for schedule(dynamic)
@@ -212,7 +216,6 @@ main(int argc, char **argv)
             Write_spying( spying, Nb_spies, Spies, flags ) ;                            // SEQUENTIAL //
         }
         //cout << "48" << endl ;
-
 
         for (int i=0 ; i<Nb_bodies ; i++) // Check failure
         {

@@ -5,7 +5,7 @@
 %%                 for DYnamic simulation                %%
 %%                                                       %%
 %%                     Main Program                      %%
-%%              Version 3.10 ; March 2019                %%
+%%               Version 3.11 ; May 2019                 %%
 %%                                                       %%
 %%                Author: Guilhem Mollon                 %%
 %%                                                       %%
@@ -20,7 +20,7 @@
 clear all
 
 %%% Preprocessing %%%
-MELODYLoadData_Micro;
+MELODYLoadData_Example;
 global NUMBER_BODIES BODIES_STATIC BODIES_DYNAMIC BODIES_CURRENT MATERIALS CONTACT_LAWS GRAPHIC_BOUNDARIES PERIODIC_BOUNDARIES GRAVITY
 mkdir(Simulation_Name);
 disp(' ')

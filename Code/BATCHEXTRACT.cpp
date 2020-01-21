@@ -36,7 +36,7 @@ main(int argc, char **argv)
     double Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling ;
 	double Save_period , Print_period , Contact_update_period ;
 	double Next_save , Next_print , Next_contact_update ;
-	int Number_save , Number_print , Number_iteration ;
+	int Number_save(0) , Number_print , Number_iteration ;
 	double Xmin_period , Xmax_period , Penalty ;
 	double Xgravity , Ygravity ;
 	int Activate_plot ;
@@ -51,9 +51,9 @@ main(int argc, char **argv)
 	vector<Spy> Spies ;
     int Nb_regions = 0 ;
 	vector<vector<int>> Regions ;
-	vector<int> flags(9) ;
+	vector<int> flags(11) ;
 	int flag_failure = 0 ;
-	vector<int> To_Plot(32) ;
+	vector<int> To_Plot(39) ;
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //
@@ -83,7 +83,7 @@ main(int argc, char **argv)
 			Bodies , flags ) ;
 			Update_contact_pressures(Nb_bodies , Bodies) ;
         Number_print = i ;
-        Spying(Nb_bodies , Bodies , Time , Deltat , Number_iteration , spying , Nb_spies , Spies) ;
+        Spying(Nb_bodies , Bodies , Time , Deltat , Number_iteration , spying , Nb_spies , Spies , Xmin_period , Xmax_period) ;
 		Write_spying( spying , Nb_spies , Spies , flags ) ;
 		//Write_graphic(Nb_bodies , Bodies , Number_iteration , Number_save , Number_print , Time , Xmin_period , Xmax_period , Nb_materials , Materials) ;
 	}
