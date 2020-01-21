@@ -32,6 +32,24 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="BATCHCHAINS.cpp" />
+		<Unit filename="BATCHEXTRACT.cpp" />
+		<Unit filename="BATCHPRINT.cpp" />
+		<Unit filename="Body.h" />
+		<Unit filename="Border.h" />
+		<Unit filename="Contact_Element.h" />
+		<Unit filename="Contact_Law.h" />
+		<Unit filename="Gauss.h" />
+		<Unit filename="Graphic.h" />
+		<Unit filename="IO.h" />
+		<Unit filename="Material.h" />
+		<Unit filename="Model.h" />
+		<Unit filename="Monitoring.h" />
+		<Unit filename="Node.h" />
+		<Unit filename="Proximity.h" />
+		<Unit filename="Solver.h" />
+		<Unit filename="Spy.h" />
+		<Unit filename="Tools.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />

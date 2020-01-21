@@ -5,25 +5,25 @@
 
 class Material
 {
-	public :
+public :
 
-	// Attributes
+    // Attributes
 
-	int index ;
-	string name ;
-	string type ;
-	vector<double> parameters ;
+    int index ;
+    string name ;
+    string type ;
+    vector<double> parameters ;
 
-	// Constructor and Destructor
-	Material(int index, string name, string type, vector<double> parameters) ;
-	~Material() ;
+    // Constructor and Destructor
+    Material(int index, string name, string type, vector<double> parameters) ;
+    ~Material() ;
 
-	// Accessors
+    // Accessors
 
-	// Modifiers
-	
-	// Methods
-	
+    // Modifiers
+
+    // Methods
+
 } ;
 
 
@@ -34,10 +34,10 @@ class Material
 
 Material::Material(int i, string n, string t, vector<double> p)
 {
-	index = i ;
-	name = n ;
-	type = t ;
-	parameters = p ;
+    index = i ;
+    name = n ;
+    type = t ;
+    parameters = p ;
 }
 
 Material::~Material()

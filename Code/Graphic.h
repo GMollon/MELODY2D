@@ -141,7 +141,7 @@ void Write_graphic(int Nb_bodies,
             borders.push_back(segmentstot[i]) ;
         }
     }
-    int nbtot = (int)borders.size() ;
+    //int nbtot = (int)borders.size() ;
 
     vector<int> bordernodestot(2*(int)borders.size()) ;
     for (int i=0 ; i<(int)borders.size() ; i++)
@@ -156,7 +156,7 @@ void Write_graphic(int Nb_bodies,
         if (bordernodestot[i]!=bordernodestot[i-1])
             bordernodes.push_back(bordernodestot[i]) ;
     }
-    int nbntot = (int)bordernodes.size() ;
+    //int nbntot = (int)bordernodes.size() ;
 
     /*
     Borders_file << "POINTS " << nbntot << " float" << endl ;
@@ -197,7 +197,7 @@ void Write_graphic(int Nb_bodies,
     */
 
 
-    double xvar, yvar, zvar ;
+    double xvar, yvar ;// zvar ;
     Graphic_file << "POINTS " << ntot << " float" << endl ;
     for (int j(0) ; j<ntot ; j++)
     {
@@ -817,7 +817,7 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	if ( To_Plot[32] == 1 )
+    if ( To_Plot[32] == 1 )
     {
         Graphic_file << "SCALARS 32_Internal_work float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
@@ -830,7 +830,7 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	if ( To_Plot[33] == 1 )
+    if ( To_Plot[33] == 1 )
     {
         Graphic_file << "SCALARS 33_Contact_work float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
@@ -843,7 +843,7 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	if ( To_Plot[34] == 1 )
+    if ( To_Plot[34] == 1 )
     {
         Graphic_file << "SCALARS 34_Body_work float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
@@ -856,7 +856,7 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	if ( To_Plot[35] == 1 )
+    if ( To_Plot[35] == 1 )
     {
         Graphic_file << "SCALARS 35_Dirichlet_work float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
@@ -911,7 +911,7 @@ void Write_graphic(int Nb_bodies,
 
     if ( To_Plot[39] == 1 )
     {
-        Graphic_file << "SCALARS 32-Epsilon_Mass_Scaling float 1" << endl ;
+        Graphic_file << "SCALARS 39-Epsilon_Mass_Scaling float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -922,9 +922,9 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	    if ( To_Plot[40] == 1 )
+    if ( To_Plot[40] == 1 )
     {
-        Graphic_file << "SCALARS 33-Unbalanced float 1" << endl ;
+        Graphic_file << "SCALARS 40-Unbalanced float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -935,7 +935,7 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-	Graphic_file.close () ;
+    Graphic_file.close () ;
 }
 
 
@@ -1145,61 +1145,68 @@ void Shift_body_graphic(int i,
 //********************************************//
 //** WRITE CHAINS ****************************//
 //********************************************//
-void Write_chains(int Nb_bodies ,
-				  vector<Body>& Bodies ,
-				  int Number_iteration ,
-				  int Number_save ,
-				  int Number_print ,
-				  double Time ,
-				  double Xmin_period ,
-				  double Xmax_period ,
-				  double Typical_pressure ,
-				  double Size_ratio)
+void Write_chains(int Nb_bodies,
+                  vector<Body>& Bodies,
+                  int Number_iteration,
+                  int Number_save,
+                  int Number_print,
+                  double Time,
+                  double Xmin_period,
+                  double Xmax_period,
+                  double Typical_pressure,
+                  double Size_ratio)
 {
-	cout << endl ;
-	cout << "Writing chains file " << Number_print << endl ;
-	string filename1 ;
-	stringstream sfilename ;
-	sfilename << Number_print;
-	if      (Number_print<10) filename1="CHAINS_0000"+sfilename.str()+".vtk" ;
-	else if (Number_print<100) filename1="CHAINS_000"+sfilename.str()+".vtk" ;
-	else if (Number_print<1000) filename1="CHAINS_00"+sfilename.str()+".vtk" ;
-	else if (Number_print<10000) filename1="CHAINS_0"+sfilename.str()+".vtk" ;
-	else if (Number_print<100000) filename1="CHAINS_"+sfilename.str()+".vtk" ;
-	ofstream Graphic_file (filename1) ;
+    cout << endl ;
+    cout << "Writing chains file " << Number_print << endl ;
+    string filename1 ;
+    stringstream sfilename ;
+    sfilename << Number_print;
+    if      (Number_print<10)
+        filename1="CHAINS_0000"+sfilename.str()+".vtk" ;
+    else if (Number_print<100)
+        filename1="CHAINS_000"+sfilename.str()+".vtk" ;
+    else if (Number_print<1000)
+        filename1="CHAINS_00"+sfilename.str()+".vtk" ;
+    else if (Number_print<10000)
+        filename1="CHAINS_0"+sfilename.str()+".vtk" ;
+    else if (Number_print<100000)
+        filename1="CHAINS_"+sfilename.str()+".vtk" ;
+    ofstream Graphic_file (filename1) ;
 
     Graphic_file << setprecision (12) ;
-	Graphic_file << "# vtk DataFile Version 2.0" << endl ;
-	Graphic_file << "MELODY 2D graphic file ; Iteration " << Number_iteration
-				 << " ; Save " << Number_save
-				 << " ; Print " << Number_print
-				 << " ; Time " << Time
-				 << " ; Typical pressure " << Typical_pressure
-				 << " ; Chains thickness ratio " << Size_ratio
-				 << endl ;
-	Graphic_file << "ASCII" << endl ;
-	Graphic_file << endl ;
-	Graphic_file << "DATASET POLYDATA" << endl ;
-	Graphic_file << endl ;
+    Graphic_file << "# vtk DataFile Version 2.0" << endl ;
+    Graphic_file << "MELODY 2D graphic file ; Iteration " << Number_iteration
+                 << " ; Save " << Number_save
+                 << " ; Print " << Number_print
+                 << " ; Time " << Time
+                 << " ; Typical pressure " << Typical_pressure
+                 << " ; Chains thickness ratio " << Size_ratio
+                 << endl ;
+    Graphic_file << "ASCII" << endl ;
+    Graphic_file << endl ;
+    Graphic_file << "DATASET POLYDATA" << endl ;
+    Graphic_file << endl ;
 
-	vector<vector<double>> points ;
-	vector<vector<double>> forces ;
-    double xs , ys , xm , ym , xc , yc , fx , fy , f , fn , ft ;
-    double shifts , shiftm , period , length , width ;
-    double x1 , y1 , x2 , y2 , x3 , y3 , x4 , y4 , ux , uy ;
-    int m , nrect ;
+    vector<vector<double>> points ;
+    vector<vector<double>> forces ;
+    double xs, ys, xm, ym, xc, yc, fx, fy, f, fn, ft ;
+    double shifts, shiftm, period, length, width ;
+    double x1, y1, x2, y2, x3, y3, x4, y4, ux, uy ;
+    int m, nrect ;
     period = Xmax_period - Xmin_period ;
     nrect = 0 ;
     for (int i=0 ; i<Nb_bodies ; i++)
     {
-        if (Bodies[i].status == "inactive") continue ;
+        if (Bodies[i].status == "inactive")
+            continue ;
         xs = Bodies[i].x_current ;
         ys = Bodies[i].y_current ;
         for (int j=0 ; j<Bodies[i].nb_contact_elements ; j++)
         {
             fx = Bodies[i].contact_elements[j].fx ;
             fy = Bodies[i].contact_elements[j].fy ;
-            if ((fx == 0.) && (fy == 0.))   continue ;
+            if ((fx == 0.) && (fy == 0.))
+                continue ;
             f = sqrt( fx * fx + fy * fy ) ;
             fn = fx * Bodies[i].contact_elements[j].xnorm + fy * Bodies[i].contact_elements[j].ynorm ;
             ft = fx * Bodies[i].contact_elements[j].xtan + fy * Bodies[i].contact_elements[j].ytan ;
@@ -1224,11 +1231,11 @@ void Write_chains(int Nb_bodies ,
                 y2 = yc - width * ux ;
                 y3 = yc + width * ux ;
                 y4 = ys + width * ux ;
-                points.push_back({ x1 , y1 }) ;
-                points.push_back({ x2 , y2 }) ;
-                points.push_back({ x3 , y3 }) ;
-                points.push_back({ x4 , y4 }) ;
-                forces.push_back({ fx , fy , fn , abs(ft) , abs(ft)/fn }) ;
+                points.push_back({ x1, y1 }) ;
+                points.push_back({ x2, y2 }) ;
+                points.push_back({ x3, y3 }) ;
+                points.push_back({ x4, y4 }) ;
+                forces.push_back({ fx, fy, fn, abs(ft), abs(ft)/fn }) ;
                 nrect++ ;
             }
 
@@ -1255,39 +1262,39 @@ void Write_chains(int Nb_bodies ,
                 y4 = ym + width * ux ;
                 if ( sqrt( (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) ) < 0.5 * period )
                 {
-                    points.push_back({ x1 , y1 }) ;
-                    points.push_back({ x2 , y2 }) ;
-                    points.push_back({ x3 , y3 }) ;
-                    points.push_back({ x4 , y4 }) ;
-                    forces.push_back({ fx , fy , fn , abs(ft) , abs(ft)/fn }) ;
+                    points.push_back({ x1, y1 }) ;
+                    points.push_back({ x2, y2 }) ;
+                    points.push_back({ x3, y3 }) ;
+                    points.push_back({ x4, y4 }) ;
+                    forces.push_back({ fx, fy, fn, abs(ft), abs(ft)/fn }) ;
                     nrect++ ;
                 }
             }
         }
     }
 
-	Graphic_file << "POINTS " << nrect * 4 << " float" << endl ;
-	for (int j(0) ; j<nrect * 4 ; j++)
-	{
-		Graphic_file << points[j][0] << ' '
-					 << points[j][1] << ' '
-					 << '1' << endl ;
-	}
-	Graphic_file << endl ;
+    Graphic_file << "POINTS " << nrect * 4 << " float" << endl ;
+    for (int j(0) ; j<nrect * 4 ; j++)
+    {
+        Graphic_file << points[j][0] << ' '
+                     << points[j][1] << ' '
+                     << '1' << endl ;
+    }
+    Graphic_file << endl ;
 
-	Graphic_file << setprecision (6) ;
-	Graphic_file << "POLYGONS " << nrect << ' ' << nrect*5 << endl ;
-	for (int j(0) ; j<nrect ; j++)
-	{
-		Graphic_file << "4 "
+    Graphic_file << setprecision (6) ;
+    Graphic_file << "POLYGONS " << nrect << ' ' << nrect*5 << endl ;
+    for (int j(0) ; j<nrect ; j++)
+    {
+        Graphic_file << "4 "
                      << j * 4 << ' '
-					 << j * 4 + 1 << ' '
-					 << j * 4 + 2 << ' '
-					 << j * 4 + 3 << endl ;
-	}
-	Graphic_file << endl ;
+                     << j * 4 + 1 << ' '
+                     << j * 4 + 2 << ' '
+                     << j * 4 + 3 << endl ;
+    }
+    Graphic_file << endl ;
 
-	Graphic_file << "CELL_DATA " << nrect << endl ;
+    Graphic_file << "CELL_DATA " << nrect << endl ;
     Graphic_file << "SCALARS 00_Contact_force float 2" << endl ;
     Graphic_file << "LOOKUP_TABLE default" << endl ;
     for (int j(0) ; j<nrect ; j++)

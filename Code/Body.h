@@ -51,44 +51,44 @@ public :
     double inverse_mass ;
     double inverse_inertia ;
     double x_initial ;
-	double y_initial ;
-	double r_initial ;
-	double x_current ;
-	double y_current ;
-	double r_current ;
-	double stored_x_current ;
-	double stored_y_current ;
-	double stored_r_current ;
-	double x_displacement ;
-	double y_displacement ;
-	double r_displacement ;
-	double x_displacement_temporary ;
-	double y_displacement_temporary ;
-	double r_displacement_temporary ;
-	double stored_x_displacement ;
-	double stored_y_displacement ;
-	double stored_r_displacement ;
-	double x_velocity ;
-	double y_velocity ;
-	double r_velocity ;
-	double x_velocity_temporary ;
-	double y_velocity_temporary ;
-	double r_velocity_temporary ;
-	double stored_x_velocity ;
-	double stored_y_velocity ;
-	double stored_r_velocity ;
-	double x_acceleration ;
-	double y_acceleration ;
-	double r_acceleration ;
-	double stored_x_acceleration ;
-	double stored_y_acceleration ;
-	double stored_r_acceleration ;
-	double x_contact_force ;
-	double y_contact_force ;
-	double r_contact_force ;
-	//vector<double> x_master_contact_forces ;
-	//vector<double> y_master_contact_forces ;
-	//vector<double> r_master_contact_forces ;
+    double y_initial ;
+    double r_initial ;
+    double x_current ;
+    double y_current ;
+    double r_current ;
+    double stored_x_current ;
+    double stored_y_current ;
+    double stored_r_current ;
+    double x_displacement ;
+    double y_displacement ;
+    double r_displacement ;
+    double x_displacement_temporary ;
+    double y_displacement_temporary ;
+    double r_displacement_temporary ;
+    double stored_x_displacement ;
+    double stored_y_displacement ;
+    double stored_r_displacement ;
+    double x_velocity ;
+    double y_velocity ;
+    double r_velocity ;
+    double x_velocity_temporary ;
+    double y_velocity_temporary ;
+    double r_velocity_temporary ;
+    double stored_x_velocity ;
+    double stored_y_velocity ;
+    double stored_r_velocity ;
+    double x_acceleration ;
+    double y_acceleration ;
+    double r_acceleration ;
+    double stored_x_acceleration ;
+    double stored_y_acceleration ;
+    double stored_r_acceleration ;
+    double x_contact_force ;
+    double y_contact_force ;
+    double r_contact_force ;
+    //vector<double> x_master_contact_forces ;
+    //vector<double> y_master_contact_forces ;
+    //vector<double> r_master_contact_forces ;
     double x_body_force ;
     double y_body_force ;
     double r_body_force ;
@@ -949,30 +949,30 @@ void Body::Update_internal_forces( int region, int Nb_materials, vector<Material
     */
     material_type=Materials[material_index].type ;
     parameters=Materials[material_index].parameters ;
-	//vector<vector<double>> S={{0,0,0},{0,0,0},{0,0,0}};
-	//vector<vector<double>> E={{0,0,0},{0,0,0},{0,0,0}};
-	//vector<vector<double>> Eref={{0,0,0},{0,0,0},{0,0,0}};
-	//vector<vector<double>> Fref={{1,0,0},{0,1,0},{0,0,1}};
-	//vector<vector<double>> F ;
-	double E11 , E12 , E22 ;
-	double S11 , S12 , S22 , S33 ;
-	double F11 , F12 , F21 , F22 ;
-	//
-	//double a , b , c , d ;
-	int n ;
-	//
-	Elastic_energy[region] = 0. ;
-	int i ;
-	double energy , c0 , J , Mu , Kappa , Lambda ;
-	for (int ii(0) ; ii<(int)region_gpoints[region].size() ; ii++)
-	{
-	    i = region_gpoints[region][ii] ;
-		if (material_type == "ElasticLinear")
-		{
-		    //E = Eref ;
-		    E11 = 0. ;
-		    E12 = 0. ;
-		    E22 = 0. ;
+    //vector<vector<double>> S={{0,0,0},{0,0,0},{0,0,0}};
+    //vector<vector<double>> E={{0,0,0},{0,0,0},{0,0,0}};
+    //vector<vector<double>> Eref={{0,0,0},{0,0,0},{0,0,0}};
+    //vector<vector<double>> Fref={{1,0,0},{0,1,0},{0,0,1}};
+    //vector<vector<double>> F ;
+    double E11, E12, E22 ;
+    double S11, S12, S22, S33 ;
+    double F11, F12, F21, F22 ;
+    //
+    //double a , b , c , d ;
+    int n ;
+    //
+    Elastic_energy[region] = 0. ;
+    int i ;
+    double energy, c0, J, Mu, Kappa, Lambda ;
+    for (int ii(0) ; ii<(int)region_gpoints[region].size() ; ii++)
+    {
+        i = region_gpoints[region][ii] ;
+        if (material_type == "ElasticLinear")
+        {
+            //E = Eref ;
+            E11 = 0. ;
+            E12 = 0. ;
+            E22 = 0. ;
             for (int j(0) ; j<gpoints[i].number_influencing_nodes ; j++)
             {
                 //E[0][0] += gpoints[i].shape_xderiv[j] * nodes[gpoints[i].influencing_nodes[j]].x_displacement_parameter ;
@@ -986,21 +986,21 @@ void Body::Update_internal_forces( int region, int Nb_materials, vector<Material
             //E[1][0] = E[0][1] ;
             E12 = 0.5 * E12 ;
             Mu = parameters[3] ;
-			Lambda = parameters[4] ;
-			Apply_Elastic_Linear( S11 , S12 , S22 , S33 , E11 , E12 , E22 , Mu , Lambda , J , energy ) ;
-			c0 = gpoints[i].weight * gpoints[i].jacobian ;
+            Lambda = parameters[4] ;
+            Apply_Elastic_Linear( S11, S12, S22, S33, E11, E12, E22, Mu, Lambda, J, energy ) ;
+            c0 = gpoints[i].weight * gpoints[i].jacobian ;
             for (int j(0) ; j<gpoints[i].number_influencing_nodes ; j++)
             {
                 nodes[gpoints[i].influencing_nodes[j]].x_regions_internal_forces[region] -= c0 * ( gpoints[i].shape_xderiv[j] * S11 + gpoints[i].shape_yderiv[j] * S12 ) ;
                 nodes[gpoints[i].influencing_nodes[j]].y_regions_internal_forces[region] -= c0 * ( gpoints[i].shape_yderiv[j] * S22 + gpoints[i].shape_xderiv[j] * S12 ) ;
             }
-		}
-		else if (material_type == "NeoHookean")
-		{
-		    F11 = 1. ;
-		    F12 = 0. ;
-		    F21 = 0. ;
-		    F22 = 1. ;
+        }
+        else if (material_type == "NeoHookean")
+        {
+            F11 = 1. ;
+            F12 = 0. ;
+            F21 = 0. ;
+            F22 = 1. ;
             //
             n = gpoints[i].number_influencing_nodes ;
             for (int j(0) ; j<n ; j++)
@@ -1019,17 +1019,17 @@ void Body::Update_internal_forces( int region, int Nb_materials, vector<Material
                 F22 += gpoints[i].shape_yderiv[j] * nodes[gpoints[i].influencing_nodes[j]].y_displacement_parameter ;
             }
             */
-			Mu = parameters[3] ;
-			Kappa = parameters[4] ;
-			Apply_NeoHookean( S11 , S12 , S22 , S33 , F11 , F12 , F21 , F22 , Mu , Kappa , J , energy ) ;
+            Mu = parameters[3] ;
+            Kappa = parameters[4] ;
+            Apply_NeoHookean( S11, S12, S22, S33, F11, F12, F21, F22, Mu, Kappa, J, energy ) ;
             c0 = gpoints[i].weight * gpoints[i].jacobian ;
             //
             for (int j(0) ; j<n ; j++)
             {
                 nodes[gpoints[i].influencing_nodes[j]].x_regions_internal_forces[region] -= c0 * ( gpoints[i].shape_xderiv[j] * ( F11 * S11 + F12 * S12 ) +
-                                                                                                   gpoints[i].shape_yderiv[j] * ( F12 * S22 + F11 * S12 ) ) ;
+                        gpoints[i].shape_yderiv[j] * ( F12 * S22 + F11 * S12 ) ) ;
                 nodes[gpoints[i].influencing_nodes[j]].y_regions_internal_forces[region] -= c0 * ( gpoints[i].shape_xderiv[j] * ( F21 * S11 + F22 * S12 ) +
-                                                                                                   gpoints[i].shape_yderiv[j] * ( F22 * S22 + F21 * S12 ) ) ;
+                        gpoints[i].shape_yderiv[j] * ( F22 * S22 + F21 * S12 ) ) ;
             }
             /*
             for (int j(0) ; j<gpoints[i].number_influencing_nodes ; j++)
@@ -1040,10 +1040,10 @@ void Body::Update_internal_forces( int region, int Nb_materials, vector<Material
                                                                                                    gpoints[i].shape_yderiv[j] * ( F22 * S22 + F21 * S12 ) ) ;
             }
             */
-		}
-		// OTHER MATERIALS ??
-		Elastic_energy[region] += energy * c0 ;
-	}
+        }
+        // OTHER MATERIALS ??
+        Elastic_energy[region] += energy * c0 ;
+    }
 }
 
 
@@ -1056,9 +1056,9 @@ void Body::Update_damping_forces()
 {
     if (type=="deformable")
     {
-        int dof0 , dof1 ;
-        int node0 , node1 ;
-        int dir0 , dir1 ;
+        int dof0, dof1 ;
+        int node0, node1 ;
+        int dir0, dir1 ;
         //double d , dx , dy ;
         double d ;
         //vector<int> test10={1,0} ;
@@ -1128,7 +1128,8 @@ void Body::Update_damping_forces()
             if ((dir0 == 0) && (dir1 == 0))
             {
                 nodes[node0].x_damping_force -= nodes[node1].x_velocity_parameter * d ;
-                if (dof0 != dof1) nodes[node1].x_damping_force -= nodes[node0].x_velocity_parameter * d ;
+                if (dof0 != dof1)
+                    nodes[node1].x_damping_force -= nodes[node0].x_velocity_parameter * d ;
             }
             else if ((dir0 == 0) && (dir1 == 1))
             {
@@ -1143,7 +1144,8 @@ void Body::Update_damping_forces()
             else if ((dir0 == 1) && (dir1 == 1))
             {
                 nodes[node0].y_damping_force -= nodes[node1].y_velocity_parameter * d ;
-                if (dof0 != dof1) nodes[node1].y_damping_force -= nodes[node0].y_velocity_parameter * d ;
+                if (dof0 != dof1)
+                    nodes[node1].y_damping_force -= nodes[node0].y_velocity_parameter * d ;
             }
         }
     }
@@ -1635,57 +1637,57 @@ void Body::Update_contacts(vector<Body>& Bodies, double xmin, double xmax)
 //** UPDATE CONTACT FORCES *******************//
 //********************************************//
 
-void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_contact_laws , vector<Contact_law>& Contact_laws , vector<vector<int>>& Contacts_Table , double xmin , double xmax )
+void Body::Update_contact_forces( double& Deltat, vector<Body>& Bodies, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax )
 {
-	int bodyM , shiftM , borderS , border_nodeS , nodeS , nodeM0 , nodeM1 , nodeM2 , nodeM3 , neig , Contact_law_index ;
-	double shapeM0 , shapeM1 , shapeM2 , shapeM3 ;
-	double  gapn , vgapn , gapt , vgapt , xnorm , ynorm , xtan , ytan , effective_mass ;
-	double Pn , Pt , Px , Py , Fsx , Fsy , length , initial_length , dx , dy , W ;
-	string contact_law_type , length_evolution , material_nameM ;
-	vector<double> parameters ;
-	string material1 , material2 ;
-	int number_influencing_nodes ;// , flag_no_law ;
-	vector<int> influencing_nodes ;
-	vector<double> shape_functions ;
-	double period = xmax - xmin ;
-	for (int icontact(0) ; icontact<nb_contact_elements ; icontact++)
-	{
-	    W = 0. ;
-		borderS = contact_elements[icontact].borderS ;
-		border_nodeS = contact_elements[icontact].border_nodeS ;
-		length = borders[borderS].length[border_nodeS] ;
-		initial_length = borders[borderS].initial_length[border_nodeS] ;
-		gapn = contact_elements[icontact].gapn ;
-		//if (gapn > length * 0.2 || gapn < -length * 0.05) continue ;
-		vgapn = contact_elements[icontact].vgapn ;
-		nodeS = contact_elements[icontact].nodeS ;
-		bodyM = contact_elements[icontact].bodyM ;
-		shiftM = contact_elements[icontact].shiftM ;
-		gapt = contact_elements[icontact].gapt ;
-		vgapt = contact_elements[icontact].vgapt ;
-		xnorm = contact_elements[icontact].xnorm ;
-		ynorm = contact_elements[icontact].ynorm ;
-		xtan = contact_elements[icontact].xtan ;
-		ytan = contact_elements[icontact].ytan ;
-		effective_mass = contact_elements[icontact].effective_mass ;
-		material_nameM = Bodies[bodyM].material_name ;
-		/*
-		flag_no_law = 1 ;
-		for (int i(0) ; i<Nb_contact_laws ; i++)
-		{
-			material1 = Contact_laws[i].material1 ;
-			material2 = Contact_laws[i].material2 ;
-			if (((material1==material_name) && (material2==material_nameM)) ||
-			    ((material2==material_name) && (material1==material_nameM)))
-			{
-				contact_law_type = Contact_laws[i].type ;
-				parameters = Contact_laws[i].parameters ;
-				length_evolution = Contact_laws[i].length_evolution ;
-				flag_no_law = 0 ;
-				break ;
-			}
-		}
-		if (flag_no_law ==1) continue ;
+    int bodyM, shiftM, borderS, border_nodeS, nodeS, nodeM0, nodeM1, nodeM2, nodeM3, Contact_law_index, neig ;
+    double shapeM0, shapeM1, shapeM2, shapeM3 ;
+    double  gapn, vgapn, gapt, vgapt, xnorm, ynorm, xtan, ytan, effective_mass ;
+    double Pn, Pt, Px, Py, Fsx, Fsy, length, initial_length, dx, dy, W ;
+    string contact_law_type, length_evolution, material_nameM ;
+    vector<double> parameters ;
+    string material1, material2 ;
+    int number_influencing_nodes ;// , flag_no_law ;
+    vector<int> influencing_nodes ;
+    vector<double> shape_functions ;
+    double period = xmax - xmin ;
+    for (int icontact(0) ; icontact<nb_contact_elements ; icontact++)
+    {
+        W = 0. ;
+        borderS = contact_elements[icontact].borderS ;
+        border_nodeS = contact_elements[icontact].border_nodeS ;
+        length = borders[borderS].length[border_nodeS] ;
+        initial_length = borders[borderS].initial_length[border_nodeS] ;
+        gapn = contact_elements[icontact].gapn ;
+        //if (gapn > length * 0.2 || gapn < -length * 0.05) continue ;
+        vgapn = contact_elements[icontact].vgapn ;
+        nodeS = contact_elements[icontact].nodeS ;
+        bodyM = contact_elements[icontact].bodyM ;
+        shiftM = contact_elements[icontact].shiftM ;
+        gapt = contact_elements[icontact].gapt ;
+        vgapt = contact_elements[icontact].vgapt ;
+        xnorm = contact_elements[icontact].xnorm ;
+        ynorm = contact_elements[icontact].ynorm ;
+        xtan = contact_elements[icontact].xtan ;
+        ytan = contact_elements[icontact].ytan ;
+        effective_mass = contact_elements[icontact].effective_mass ;
+        material_nameM = Bodies[bodyM].material_name ;
+        /*
+        flag_no_law = 1 ;
+        for (int i(0) ; i<Nb_contact_laws ; i++)
+        {
+        	material1 = Contact_laws[i].material1 ;
+        	material2 = Contact_laws[i].material2 ;
+        	if (((material1==material_name) && (material2==material_nameM)) ||
+        	    ((material2==material_name) && (material1==material_nameM)))
+        	{
+        		contact_law_type = Contact_laws[i].type ;
+        		parameters = Contact_laws[i].parameters ;
+        		length_evolution = Contact_laws[i].length_evolution ;
+        		flag_no_law = 0 ;
+        		break ;
+        	}
+        }
+        if (flag_no_law ==1) continue ;
         */
         Contact_law_index = Contacts_Table[material_index][Bodies[bodyM].material_index] ;
         if (Contact_law_index > -1)
@@ -1694,38 +1696,39 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
             parameters = Contact_laws[Contact_law_index].parameters ;
             length_evolution = Contact_laws[Contact_law_index].length_evolution ;
         }
-        else continue ;
-		if (contact_law_type == "Frictionless")
-		{
-			double kn = parameters[0] ;
-			Apply_Frictionless( kn , gapn , gapt , Pn , Pt) ;
-		}
-		else if (contact_law_type == "Cohesion")
-		{
-			double kn = parameters[0] ;
-			double kt = parameters[1] ;
-			double gtang = parameters[2] ;
-			double gtens = parameters[3] ;
-			Apply_Cohesion( kn , kt , gtang*0.5 , gtens*0.5 , gapn , gapt , Pn , Pt) ;
-		}
-		else if (contact_law_type == "MohrCoulomb")
-		{
-			double kn = parameters[0] ;
-			double kt = parameters[1] ;
-			double fric = parameters[2] ;
-			double coh = parameters[3] ;
-			double tens = parameters[4] ;
-			Apply_Mohr_Coulomb( kn , kt , fric , coh*0.5 , tens*0.5 , gapn , gapt , Pn , Pt) ;
-		}
-		else if (contact_law_type == "DampedMohrCoulomb")
-		{
-			double kn = parameters[0] ;
-			double kt = parameters[1] ;
-			double fric = parameters[2] ;
-			double coh = parameters[3] ;
-			double tens = parameters[4] ;
-			double damp = parameters[5] ;
-			Apply_Damped_Mohr_Coulomb(kn , kt , fric , coh*0.5 , tens*0.5 , damp , effective_mass , initial_length , gapn , vgapn , gapt , vgapt , Pn , Pt , W) ;
+        else
+            continue ;
+        if (contact_law_type == "Frictionless")
+        {
+            double kn = parameters[0] ;
+            Apply_Frictionless( kn, gapn, gapt, Pn, Pt) ;
+        }
+        else if (contact_law_type == "Cohesion")
+        {
+            double kn = parameters[0] ;
+            double kt = parameters[1] ;
+            double gtang = parameters[2] ;
+            double gtens = parameters[3] ;
+            Apply_Cohesion( kn, kt, gtang*0.5, gtens*0.5, gapn, gapt, Pn, Pt) ;
+        }
+        else if (contact_law_type == "MohrCoulomb")
+        {
+            double kn = parameters[0] ;
+            double kt = parameters[1] ;
+            double fric = parameters[2] ;
+            double coh = parameters[3] ;
+            double tens = parameters[4] ;
+            Apply_Mohr_Coulomb( kn, kt, fric, coh*0.5, tens*0.5, gapn, gapt, Pn, Pt) ;
+        }
+        else if (contact_law_type == "DampedMohrCoulomb")
+        {
+            double kn = parameters[0] ;
+            double kt = parameters[1] ;
+            double fric = parameters[2] ;
+            double coh = parameters[3] ;
+            double tens = parameters[4] ;
+            double damp = parameters[5] ;
+            Apply_Damped_Mohr_Coulomb(kn, kt, fric, coh*0.5, tens*0.5, damp, effective_mass, initial_length, gapn, vgapn, gapt, vgapt, Pn, Pt, W) ;
         }
         else if (contact_law_type == "TwoSlopesMohrCoulomb")
         {
@@ -1839,13 +1842,13 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
         contact_elements[icontact].fx = Fsx ;
         contact_elements[icontact].fy = Fsy ;
 
-		contact_work += 0.5 * W ;
-		Bodies[bodyM].contact_work += 0.5 * W ; // Possible writing conflict !
+        contact_work += 0.5 * W ;
+        Bodies[bodyM].contact_work += 0.5 * W ; // Possible writing conflict !
 
 
-		//if (gapn>1.e-6 & abs(Pn)>0.) cout << index << ' ' << contact_elements[icontact].borderS << ' ' << contact_elements[icontact].border_nodeS << ' ' << contact_elements[icontact].bodyM << ' ' << gapn << ' ' << gapt << ' ' << Pn << ' ' << Pt << ' ' << Px << ' ' << Py << endl ;
-		//borders[borderS].x_contact_pressure[border_nodeS] += Px ;
-		//borders[borderS].y_contact_pressure[border_nodeS] += Py ;
+        //if (gapn>1.e-6 & abs(Pn)>0.) cout << index << ' ' << contact_elements[icontact].borderS << ' ' << contact_elements[icontact].border_nodeS << ' ' << contact_elements[icontact].bodyM << ' ' << gapn << ' ' << gapt << ' ' << Pn << ' ' << Pt << ' ' << Px << ' ' << Py << endl ;
+        //borders[borderS].x_contact_pressure[border_nodeS] += Px ;
+        //borders[borderS].y_contact_pressure[border_nodeS] += Py ;
 
         if (type=="deformable")
         {
@@ -1887,8 +1890,8 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
             {
                 //Bodies[bodyM].nodes[influencing_nodes[j]].x_master_contact_forces[neig] -= Fsx * shapeM0 * shape_functions[j] ;
                 //Bodies[bodyM].nodes[influencing_nodes[j]].y_master_contact_forces[neig] -= Fsy * shapeM0 * shape_functions[j] ;
-                contact_forces_to_send.push_back({ -Fsx * shapeM0 * shape_functions[j] , -Fsy * shapeM0 * shape_functions[j] }) ;
-                contact_forces_to_send_to.push_back({ bodyM , influencing_nodes[j] }) ;
+                contact_forces_to_send.push_back({ -Fsx * shapeM0 * shape_functions[j], -Fsy * shapeM0 * shape_functions[j] }) ;
+                contact_forces_to_send_to.push_back({ bodyM, influencing_nodes[j] }) ;
             }
             number_influencing_nodes = Bodies[bodyM].nodes[nodeM1].number_influencing_nodes ;
             influencing_nodes = Bodies[bodyM].nodes[nodeM1].influencing_nodes ;
@@ -1897,8 +1900,8 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
             {
                 //Bodies[bodyM].nodes[influencing_nodes[j]].x_master_contact_forces[neig] -= Fsx * shapeM1 * shape_functions[j] ;
                 //Bodies[bodyM].nodes[influencing_nodes[j]].y_master_contact_forces[neig] -= Fsy * shapeM1 * shape_functions[j] ;
-                contact_forces_to_send.push_back({ -Fsx * shapeM1 * shape_functions[j] , -Fsy * shapeM1 * shape_functions[j] }) ;
-                contact_forces_to_send_to.push_back({ bodyM , influencing_nodes[j] }) ;
+                contact_forces_to_send.push_back({ -Fsx * shapeM1 * shape_functions[j], -Fsy * shapeM1 * shape_functions[j] }) ;
+                contact_forces_to_send_to.push_back({ bodyM, influencing_nodes[j] }) ;
             }
             number_influencing_nodes = Bodies[bodyM].nodes[nodeM2].number_influencing_nodes ;
             influencing_nodes = Bodies[bodyM].nodes[nodeM2].influencing_nodes ;
@@ -1907,8 +1910,8 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
             {
                 //Bodies[bodyM].nodes[influencing_nodes[j]].x_master_contact_forces[neig] -= Fsx * shapeM2 * shape_functions[j] ;
                 //Bodies[bodyM].nodes[influencing_nodes[j]].y_master_contact_forces[neig] -= Fsy * shapeM2 * shape_functions[j] ;
-                contact_forces_to_send.push_back({ -Fsx * shapeM2 * shape_functions[j] , -Fsy * shapeM2 * shape_functions[j] }) ;
-                contact_forces_to_send_to.push_back({ bodyM , influencing_nodes[j] }) ;
+                contact_forces_to_send.push_back({ -Fsx * shapeM2 * shape_functions[j], -Fsy * shapeM2 * shape_functions[j] }) ;
+                contact_forces_to_send_to.push_back({ bodyM, influencing_nodes[j] }) ;
             }
             number_influencing_nodes = Bodies[bodyM].nodes[nodeM3].number_influencing_nodes ;
             influencing_nodes = Bodies[bodyM].nodes[nodeM3].influencing_nodes ;
@@ -1917,16 +1920,16 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
             {
                 //Bodies[bodyM].nodes[influencing_nodes[j]].x_master_contact_forces[neig] -= Fsx * shapeM3 * shape_functions[j] ;
                 //Bodies[bodyM].nodes[influencing_nodes[j]].y_master_contact_forces[neig] -= Fsy * shapeM3 * shape_functions[j] ;
-                contact_forces_to_send.push_back({ -Fsx * shapeM3 * shape_functions[j] , -Fsy * shapeM3 * shape_functions[j] }) ;
-                contact_forces_to_send_to.push_back({ bodyM , influencing_nodes[j] }) ;
+                contact_forces_to_send.push_back({ -Fsx * shapeM3 * shape_functions[j], -Fsy * shapeM3 * shape_functions[j] }) ;
+                contact_forces_to_send_to.push_back({ bodyM, influencing_nodes[j] }) ;
             }
         }
         else if (Bodies[bodyM].type=="rigid")
         {
             dx = nodes[nodeS].x_current - Bodies[bodyM].x_current - shiftM * period ;
             dy = nodes[nodeS].y_current - Bodies[bodyM].y_current ;
-            contact_forces_to_send.push_back({ -Fsx , -Fsy , Fsx * dy - Fsy * dx }) ;
-            contact_forces_to_send_to.push_back({ bodyM , -1 }) ;
+            contact_forces_to_send.push_back({ -Fsx, -Fsy, Fsx * dy - Fsy * dx }) ;
+            contact_forces_to_send_to.push_back({ bodyM, -1 }) ;
             //Bodies[bodyM].x_master_contact_forces[neig] -= Fsx ;
             //Bodies[bodyM].y_master_contact_forces[neig] -= Fsy ;
             //Bodies[bodyM].r_master_contact_forces[neig] -= -Fsx * dy + Fsy * dx ;
@@ -1942,7 +1945,7 @@ void Body::Update_contact_forces( double Deltat , vector<Body>& Bodies , int Nb_
 
 void Body::Send_contact_forces(vector<Body>& Bodies)
 {
-    int b , n ;
+    int b, n ;
     for (int j=0 ; j<(int)contact_forces_to_send_to.size() ; j++)
     {
         b = contact_forces_to_send_to[j][0] ;
@@ -2231,7 +2234,7 @@ void Body::Update_kinematics()
 
 void Body::Update_kinematics_temporary()
 {
-    double dx, dy, dr, vx, vy, ax, ay ;
+    double dx, dy, dr; // vx, vy, ax, ay ;
     if (type=="deformable")
     {
         for (int i(0) ; i<nb_nodes ; i++)
@@ -2326,16 +2329,16 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
         parameters=Materials[material_index].parameters ;
         int number_influencing_nodes ;
         vector<int> influencing_nodes ;
-        vector<double> shape_xderiv , shape_yderiv ;
-        double J , Sigmaxx , Sigmayy , Sigmaxy , Sigmazz , Mu , Lambda , Kappa , energy , Exx , Eyy , Exy , NormE ;
+        vector<double> shape_xderiv, shape_yderiv ;
+        double J, Sigmaxx, Sigmayy, Sigmaxy, Sigmazz, Mu, Lambda, Kappa, energy, Exx, Eyy, Exy, NormE ;
         //vector<vector<double>> S={{0,0,0},{0,0,0},{0,0,0}};
         //vector<vector<double>> E={{0,0,0},{0,0,0},{0,0,0}};
         //vector<vector<double>> Eref={{0,0,0},{0,0,0},{0,0,0}};
         //vector<vector<double>> Fref={{1,0,0},{0,1,0},{0,0,1}};
         //vector<vector<double>> F ;
-        double E11 , E12 , E22 ;
-        double S11 , S12 , S22 , S33 ;
-        double F11 , F12 , F21 , F22 ;
+        double E11, E12, E22 ;
+        double S11, S12, S22, S33 ;
+        double F11, F12, F21, F22 ;
         for (int i(0) ; i<nb_nodes ; i++)
         {
             number_influencing_nodes = nodes[i].number_influencing_nodes ;
@@ -2359,7 +2362,7 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
                 Mu = parameters[3] ;
                 Lambda = parameters[4] ;
                 //Apply_Elastic_Linear( S , E , Mu , Lambda , J , energy ) ;
-                Apply_Elastic_Linear( S11 , S12 , S22 , S33 , E11 , E12 , E22 , Mu , Lambda , J , energy ) ;
+                Apply_Elastic_Linear( S11, S12, S22, S33, E11, E12, E22, Mu, Lambda, J, energy ) ;
                 if (J<0.)
                 {
                     S11 = 0. ;
@@ -2374,7 +2377,7 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
                 Exx = E11 ;
                 Eyy = E22 ;
                 Exy = E12 ;
-                NormE = pow ( Exx * Exx + Eyy * Eyy + 2. * Exy * Exy , 0.5 ) ;
+                NormE = pow ( Exx * Exx + Eyy * Eyy + 2. * Exy * Exy, 0.5 ) ;
             }
             else if (material_type == "NeoHookean")
             {
@@ -2392,7 +2395,7 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
                 }
                 Mu = parameters[3] ;
                 Kappa = parameters[4] ;
-                Apply_NeoHookean( S11 , S12 , S22 , S33 , F11 , F12 , F21 , F22 , Mu , Kappa , J , energy ) ;
+                Apply_NeoHookean( S11, S12, S22, S33, F11, F12, F21, F22, Mu, Kappa, J, energy ) ;
                 if (J<0.)
                 {
                     F11 = 0. ;
@@ -2418,7 +2421,7 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
                 Exx = 0.5 * ( F11 * F11 + F21 * F21 - 1. ) ;
                 Eyy = 0.5 * ( F12 * F12 + F22 * F22 - 1. ) ;
                 Exy = 0.5 * ( F12 * F11 + F22 * F21 ) ;
-                NormE = pow ( Exx * Exx + Eyy * Eyy + 2. * Exy * Exy , 0.5 ) ;
+                NormE = pow ( Exx * Exx + Eyy * Eyy + 2. * Exy * Exy, 0.5 ) ;
             }
             //
             // OTHER MATERIALS ??
@@ -2529,13 +2532,16 @@ void Body::Compute_error()
     {
         max_error = 0. ;
         node_for_max_error = 0 ;
-        for (int i(0) ; i<nb_nodes ; i++) nodes[i].Compute_error(total_error, max_error, node_for_max_error, drivendof[0], drivendof[4], i) ;
+        for (int i(0) ; i<nb_nodes ; i++)
+            nodes[i].Compute_error(total_error, max_error, node_for_max_error, drivendof[0], drivendof[4], i) ;
         //if (std::isnan(total_error)) status = "inactive" ;
     }
     else if (type=="rigid")
     {
-        if (drivendof[0] != 1.)	total_error += ( x_displacement - x_displacement_temporary ) * ( x_displacement - x_displacement_temporary ) ;
-        if (drivendof[4] != 1.)	total_error += ( y_displacement - y_displacement_temporary ) * ( y_displacement - y_displacement_temporary ) ;
+        if (drivendof[0] != 1.)
+            total_error += ( x_displacement - x_displacement_temporary ) * ( x_displacement - x_displacement_temporary ) ;
+        if (drivendof[4] != 1.)
+            total_error += ( y_displacement - y_displacement_temporary ) * ( y_displacement - y_displacement_temporary ) ;
         total_error = 0.1 * sqrt( total_error ) / nodal_distance ;
         if (total_error==0.)
             total_error = 1.e-16 ;

@@ -295,8 +295,10 @@ void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     }
     else
     {
-        if (x_factor_mass_scaling != 1) x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
-        if (x_factor_mass_scaling < 1) x_factor_mass_scaling = 1;
+        if (x_factor_mass_scaling != 1)
+            x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (x_factor_mass_scaling < 1)
+            x_factor_mass_scaling = 1;
     }
 
 
@@ -309,8 +311,10 @@ void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, do
     }
     else
     {
-        if (y_factor_mass_scaling != 1) y_factor_mass_scaling *= Decrease_factor_mass_scaling ;
-        if (y_factor_mass_scaling < 1) y_factor_mass_scaling = 1;
+        if (y_factor_mass_scaling != 1)
+            y_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (y_factor_mass_scaling < 1)
+            y_factor_mass_scaling = 1;
     }
 
 

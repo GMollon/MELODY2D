@@ -5,70 +5,70 @@
 
 class Border
 {
-	public :
+public :
 
-	// Static attributes
-	int            number_border_nodes ;
-	vector<int>    border_nodes ;
-	string         periodicity ;
-	string         interpolant ;
-	int			   body ;
-	int			   index ;
-	int            number_xdirichlet_values ;
-	vector<double> xdirichlet_instants ;
-	vector<double> xdirichlet_values ;
-	vector<double> xdirichlet_parameters ;
-	int            number_ydirichlet_values ;
-	vector<double> ydirichlet_instants ;
-	vector<double> ydirichlet_values ;
-	vector<double> ydirichlet_parameters ;
-	int            number_xneumann_values ;
-	vector<double> xneumann_instants ;
-	vector<double> xneumann_values ;
-	int            number_yneumann_values ;
-	vector<double> yneumann_instants ;
-	vector<double> yneumann_values ;
+    // Static attributes
+    int            number_border_nodes ;
+    vector<int>    border_nodes ;
+    string         periodicity ;
+    string         interpolant ;
+    int			   body ;
+    int			   index ;
+    int            number_xdirichlet_values ;
+    vector<double> xdirichlet_instants ;
+    vector<double> xdirichlet_values ;
+    vector<double> xdirichlet_parameters ;
+    int            number_ydirichlet_values ;
+    vector<double> ydirichlet_instants ;
+    vector<double> ydirichlet_values ;
+    vector<double> ydirichlet_parameters ;
+    int            number_xneumann_values ;
+    vector<double> xneumann_instants ;
+    vector<double> xneumann_values ;
+    int            number_yneumann_values ;
+    vector<double> yneumann_instants ;
+    vector<double> yneumann_values ;
 
-	// Dynamic attributes
-	string         x_bc_type ;
-	double         x_bc_value ;
-	double         x_bc_velocity ;
-	string         y_bc_type ;
-	double         y_bc_value ;
-	double         y_bc_velocity ;
-	vector<double> length ;
-	vector<double> initial_length ;
-	vector<int>    node0 ;
-	vector<int>    shift0 ;
-	vector<int>    node1 ;
-	vector<int>    shift1 ;
-	vector<int>    node2 ;
-	vector<int>    shift2 ;
-	vector<int>    node3 ;
-	vector<int>    shift3 ;
-	vector<double> x_contact_pressure ;
-	vector<double> y_contact_pressure ;
-	vector<double> x_bc_pressure ;
-	vector<double> y_bc_pressure ;
-	double		   xmin_prox ;
-	double		   xmax_prox ;
-	double		   ymin_prox ;
-	double		   ymax_prox ;
-	int			   shiftmin ;
-	int			   shiftmax ;
-	int            border_before ;
-	int            border_after ;
+    // Dynamic attributes
+    string         x_bc_type ;
+    double         x_bc_value ;
+    double         x_bc_velocity ;
+    string         y_bc_type ;
+    double         y_bc_value ;
+    double         y_bc_velocity ;
+    vector<double> length ;
+    vector<double> initial_length ;
+    vector<int>    node0 ;
+    vector<int>    shift0 ;
+    vector<int>    node1 ;
+    vector<int>    shift1 ;
+    vector<int>    node2 ;
+    vector<int>    shift2 ;
+    vector<int>    node3 ;
+    vector<int>    shift3 ;
+    vector<double> x_contact_pressure ;
+    vector<double> y_contact_pressure ;
+    vector<double> x_bc_pressure ;
+    vector<double> y_bc_pressure ;
+    double		   xmin_prox ;
+    double		   xmax_prox ;
+    double		   ymin_prox ;
+    double		   ymax_prox ;
+    int			   shiftmin ;
+    int			   shiftmax ;
+    int            border_before ;
+    int            border_after ;
 
-	// Constructor and Destructor
-	Border(int n, string p , int b , int i) ;
-	~Border() ;
+    // Constructor and Destructor
+    Border(int n, string p, int b, int i) ;
+    ~Border() ;
 
-	// Accessors
+    // Accessors
 
-	// Modifiers
+    // Modifiers
 
-	// Methods
-	void Update_bc(double t) ;
+    // Methods
+    void Update_bc(double t) ;
 } ;
 
 
@@ -77,22 +77,22 @@ class Border
 // Content of the class
 
 // Constructor and Destructor
-Border::Border (int n, string p , int b , int i)
+Border::Border (int n, string p, int b, int i)
 {
-	number_border_nodes = n ;
-	periodicity = p ;
-	body = b ;
-	index = i ;
-	interpolant = "Linear" ;//"Spline" ;//
-	xmin_prox = 0. ;
-	xmax_prox = 0. ;
-	ymin_prox = 0. ;
+    number_border_nodes = n ;
+    periodicity = p ;
+    body = b ;
+    index = i ;
+    interpolant = "Linear" ;//"Spline" ;//
+    xmin_prox = 0. ;
+    xmax_prox = 0. ;
+    ymin_prox = 0. ;
     ymax_prox = 0. ;
-	shiftmin = 0 ;
-	shiftmax = 0 ;
-	x_contact_pressure = {0.} ;
-	y_contact_pressure = {0.} ;
-	for (int i(0) ; i<n ; i++)
+    shiftmin = 0 ;
+    shiftmax = 0 ;
+    x_contact_pressure = {0.} ;
+    y_contact_pressure = {0.} ;
+    for (int i(0) ; i<n ; i++)
     {
         x_contact_pressure.push_back(0.) ;
         y_contact_pressure.push_back(0.) ;
@@ -119,13 +119,13 @@ Border::~Border()
 
 void Border::Update_bc(double Time)
 {
-	double t0 , t1 , p0 , p1 ;
+    double t0, t1, p0, p1 ;
 
-	// Setting current bc along x (type and value)
+    // Setting current bc along x (type and value)
 
 
-	//
-	if (x_bc_type != "driven")
+    //
+    if (x_bc_type != "driven")
     {
         if (x_bc_type == "soft")
         {
@@ -172,7 +172,7 @@ void Border::Update_bc(double Time)
         }
     }
 
-	if (y_bc_type != "driven")
+    if (y_bc_type != "driven")
     {
         if (y_bc_type == "soft")
         {
@@ -218,8 +218,8 @@ void Border::Update_bc(double Time)
             y_bc_value = 0. ;
         }
     }
-	/*
-	if (x_bc_type != "driven")
+    /*
+    if (x_bc_type != "driven")
     {
         if ( number_xneumann_values != 0 )
         {
@@ -268,8 +268,8 @@ void Border::Update_bc(double Time)
         }
     }
 
-	// Setting current bc along y (type and value)
-	if (y_bc_type != "driven")
+    // Setting current bc along y (type and value)
+    if (y_bc_type != "driven")
     {
         if ( number_yneumann_values != 0 )
         {

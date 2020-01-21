@@ -106,9 +106,10 @@ main(int argc, char **argv)
     for (int i=0 ; i<Nb_bodies ; i++)
         Bodies[i].Update_borders(Xmin_period, Xmax_period) ;
 
-    for (int i=0 ; i<Nb_bodies ; i++) Bodies[i].Update_bc(Time) ;
+    for (int i=0 ; i<Nb_bodies ; i++)
+        Bodies[i].Update_bc(Time) ;
 
-    Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period) ;
+    Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period, flags) ;
     if (flags[3]==1)
         Initialize_CZM( Nb_bodies, Bodies, Nb_contact_laws, Contact_laws, flags, Xmin_period, Xmax_period ) ;
     cout << "Updating Material Properties" << endl ;
@@ -140,23 +141,22 @@ main(int argc, char **argv)
         //********************************************//
         if ( Solver == "Euler" )
         {
-            Euler_step(Nb_bodies, Bodies, Nb_materials,
-                       Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
-                       Tend, Xmin_period, Xmax_period, Penalty,
-                       Xgravity, Ygravity,
-                       Time, Deltat, Number_iteration) ;
+            Euler_step(Nb_bodies, Bodies, Nb_regions,Regions,
+                       Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
+                       Tend, Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,
+                       Time, Deltat, Number_iteration, flags) ;
         }
         else if ( Solver == "Adaptive_Euler" || Solver == "Mass_Scaling" || Solver == "Adaptive_Mass_Scaling" || Solver == "Euler_2")
         {
             Solver_step(Nb_bodies, Bodies, Nb_regions, Regions,
-                                Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
-                                Tend, Xmin_period, Xmax_period, Penalty,
-                                Xgravity, Ygravity,
-                                Time, Deltat, Number_iteration,
-                                Next_contact_update, Contact_update_period,
-                                Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
-                                Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
-                                neval, max_error, mean_error, flags, total_mass, max_mass, Solver) ;
+                        Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
+                        Tend, Xmin_period, Xmax_period, Penalty,
+                        Xgravity, Ygravity,
+                        Time, Deltat, Number_iteration,
+                        Next_contact_update, Contact_update_period,
+                        Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                        Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
+                        neval, max_error, mean_error, flags, total_mass, max_mass, Solver) ;
             //cout << "   SOLVER : " << Solver << " " << endl ;
         }
 
@@ -175,7 +175,7 @@ main(int argc, char **argv)
         //********************************************//
         Spying(Nb_bodies, Bodies,
                Time, Deltat, Number_iteration,
-               spying, Nb_spies, Spies) ;                                               // SEQUENTIAL //
+               spying, Nb_spies, Spies, Xmin_period, Xmax_period) ;                     // SEQUENTIAL //
         //cout << "45" << endl ;
 
         //********************************************//
@@ -184,7 +184,7 @@ main(int argc, char **argv)
         if ( Time > Next_contact_update-1.e-6*Deltat )                                  // SEQUENTIAL //
         {
             Next_contact_update = Next_contact_update + Contact_update_period ;
-            Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period) ;
+            Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period, flags) ;
             Update_status(Nb_bodies, Bodies, Nb_deactivated, Deactivated) ;             // SEQUENTIAL //
         }
         //cout << "46" << endl ;
