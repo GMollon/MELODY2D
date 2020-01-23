@@ -587,19 +587,19 @@ void Load_static(
 				vector<double> parameters({0}) ;
 				if (type=="ElasticLinear")
 				{
-					double p1 , p2 , p3 , p4 , p5 ;
-					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+					double p1 , p2 , p3 , p4 , p5 , p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
 					getline(Static_Control_file, token) ;
-					vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 * p5 / (( 1. + p5 ) * ( 1. - 2. * p5 ))}) ;
+					vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 * p5 / (( 1. + p5 ) * ( 1. - 2. * p5 )), p6}) ;
 					Material mat ( i , name , type , parameters ) ;
 					Materials.push_back(mat) ;
 				}
 				else if (type=="NeoHookean")
 				{
-					double p1 , p2 , p3 , p4 , p5 ;
-					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+					double p1 , p2 , p3 , p4 , p5 , p6 ;
+					Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
 					getline(Static_Control_file, token) ;
-					vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 / ( 3. * (1. - 2. * p5 ))}) ;
+					vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 / ( 3. * (1. - 2. * p5 )), p6}) ;
 					Material mat ( i , name , type , parameters ) ;
 					Materials.push_back(mat) ;
 				}
@@ -845,7 +845,7 @@ void Load_static(
         if (line.substr(0,7)=="GRAPHIC")
         {
             int j ;
-			for (int i(0) ; i < 39 ; i++)
+			for (int i(0) ; i < 40 ; i++)
 			{
                 Static_Control_file >> j >> token ;
                 getline(Static_Control_file, token) ;
@@ -879,6 +879,7 @@ void Load_static(
                 {
                     body.density=Materials[i].parameters[0] ;
                     body.material_index=i ;
+                    body.heat_capacity=Materials[i].parameters[5] ;
                     break ;
                 }
             }
@@ -911,6 +912,7 @@ void Load_static(
                 {
                     body.density=Materials[i].parameters[0] ;
                     body.material_index=i ;
+                    body.heat_capacity=Materials[i].parameters[5] ;
                     break ;
                 }
             }
@@ -1372,6 +1374,7 @@ void Load_static(
 			if (flag_body_rigid==0)
             {
                 nd += 2 * nb_nodes ;
+                Bodies[index_body].mass = 0. ;
                 double j , ka , kb , temp , xini , yini , d , mx , my , imx , imy ;
                 for (int i(0) ; i < nb_nodes ; i++)
                 {
@@ -1384,6 +1387,7 @@ void Load_static(
                                 >> imx
                                 >> imy ;
                     getline(Static_Data_file, token) ;
+                    Bodies[index_body].mass += mx ;
                     Node node ( xini , yini , d , mx , my , imx , imy ) ;
                     //
                     node.alid_alpha = 0. ;
@@ -1440,9 +1444,10 @@ void Load_static(
                     */
                     nodes.push_back(node) ;
                 }
-                Bodies[index_body].nodes=nodes ;
-                Bodies[index_body].stored_nodes=nodes ;
-                Bodies[index_body].nb_nodes=nb_nodes ;
+                Bodies[index_body].inverse_mass = 1. / Bodies[index_body].mass ;
+                Bodies[index_body].nodes = nodes ;
+                Bodies[index_body].stored_nodes = nodes ;
+                Bodies[index_body].nb_nodes = nb_nodes ;
             }
             else if (flag_body_rigid==1)
             {

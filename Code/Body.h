@@ -143,6 +143,8 @@ class Body
     double density ;
     vector<vector<double>> contact_forces_to_send ;
     vector<vector<int>> contact_forces_to_send_to ;
+    double heat_capacity ;
+    double temperature ;
 
 	// Constructor and Destructor
 	Body(int i, string m, string p, string t) ;
@@ -2017,6 +2019,7 @@ void Body::Apply_Euler(double Deltat)
             alid_work += Deltat * ( vx * nodes[i].x_alid_force + vy * nodes[i].y_alid_force ) ;
             nodes[i].Apply_Euler(Deltat) ;
         }
+        temperature = -(contact_work + damping_work) / (mass * heat_capacity) ;
     }
     else if (type=="rigid")
     {
@@ -2029,6 +2032,7 @@ void Body::Apply_Euler(double Deltat)
         dirichlet_work += Deltat * ( vx * x_dirichlet_force + vy * y_dirichlet_force + vr * r_dirichlet_force ) ;
         neumann_work += Deltat * ( vx * x_neumann_force + vy * y_neumann_force + vr * r_neumann_force ) ;
         damping_work += Deltat * ( vx * x_damping_force + vy * y_damping_force + vr * r_damping_force ) ;
+        temperature = -(contact_work + damping_work) / (mass * heat_capacity) ;
         if (drivendof[0] == 0.)
         {
             x_velocity += Deltat * x_acceleration ;

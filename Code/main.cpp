@@ -31,7 +31,7 @@ main(int argc, char **argv)
 	cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                     Main Program                      %%" << endl ;
-	cout << "%%         Version 3.90 ; 13th of November 2019          %%" << endl ;
+	cout << "%%       Version 3.90dev ; 13th of November 2019         %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
 	cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
 	cout << "%%                                                       %%" << endl ;
@@ -74,7 +74,7 @@ main(int argc, char **argv)
 	vector<vector<int>> Regions ;
 	vector<int> flags(11) ;
 	int flag_failure = 0 ;
-	vector<int> To_Plot(39) ;
+	vector<int> To_Plot(40) ;
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //

@@ -808,6 +808,19 @@ void Write_graphic(int Nb_bodies ,
         Graphic_file << endl ;
     }
 
+    if ( To_Plot[39] == 1 )
+    {
+        Graphic_file << "SCALARS 38_Temperature float 1" << endl ;
+        Graphic_file << "LOOKUP_TABLE default" << endl ;
+        for (int j(0) ; j<ntot ; j++)
+        {
+            bo = indicestot[j][0] ;
+            no = indicestot[j][1] ;
+            Graphic_file << Bodies[bo].temperature << endl ;
+        }
+        Graphic_file << endl ;
+    }
+
 	Graphic_file.close () ;
 }
 

@@ -50,7 +50,7 @@ main(int argc, char **argv)
     int Nb_regions = 0 ;
 	vector<vector<int>> Regions ;
 	vector<int> flags(11) ;
-	vector<int> To_Plot(39) ;
+	vector<int> To_Plot(40) ;
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //

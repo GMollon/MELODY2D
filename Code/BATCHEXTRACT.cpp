@@ -52,7 +52,7 @@ main(int argc, char **argv)
 	vector<vector<int>> Regions ;
 	vector<int> flags(11) ;
 	int flag_failure = 0 ;
-	vector<int> To_Plot(39) ;
+	vector<int> To_Plot(40) ;
 	vector<vector<int>> Contacts_Table ;
 
 	// LOAD STATIC DATA //
