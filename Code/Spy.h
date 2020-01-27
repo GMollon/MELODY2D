@@ -5,24 +5,24 @@
 
 class Spy
 {
-	public :
+public :
 
-	// Attributes
-	string filename ;
-	int    nb_quantities ;
-	double period ;
-	vector<vector<double>> quantities ;
-	double next_time ;
+    // Attributes
+    string filename ;
+    int    nb_quantities ;
+    double period ;
+    vector<vector<double>> quantities ;
+    double next_time ;
 
-	// Constructor and Destructor
-	Spy(string filename , int nb_quantities , double period , vector<vector<double>> quantities) ;
-	~Spy() ;
+    // Constructor and Destructor
+    Spy(string filename, int nb_quantities, double period, vector<vector<double>> quantities) ;
+    ~Spy() ;
 
-	// Accessors
+    // Accessors
 
-	// Modifiers
+    // Modifiers
 
-	// Methods
+    // Methods
 } ;
 
 
@@ -31,13 +31,13 @@ class Spy
 // Content of the class
 
 // Constructor and Destructor
-Spy::Spy(string f , int nq , double p , vector<vector<double>> q)
+Spy::Spy(string f, int nq, double p, vector<vector<double>> q)
 {
-	filename = f ;
-	nb_quantities = nq ;
-	period = p ;
-	quantities = q ;
-	next_time = 0. ; //p ;
+    filename = f ;
+    nb_quantities = nq ;
+    period = p ;
+    quantities = q ;
+    next_time = 0. ; //p ;
 }
 
 Spy::~Spy()

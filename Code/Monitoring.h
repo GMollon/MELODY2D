@@ -5,24 +5,24 @@
 //** MONITORING ******************************//
 //********************************************//
 
-void Monitoring(int Nb_bodies ,
-	vector<Body>& Bodies ,
-	double Time ,
-	double& Deltat ,
-	int& Number_iteration ,
-	int& neval ,
-	double& max_error ,
-	double& mean_error ,
-	vector<int>& flags ,
-    vector<vector<double>>& monitoring ,
-    int& Nb_monitored ,
-    vector<vector<double>>& Monitored)
+void Monitoring(int Nb_bodies,
+                vector<Body>& Bodies,
+                double Time,
+                double& Deltat,
+                int& Number_iteration,
+                int& neval,
+                double& max_error,
+                double& mean_error,
+                vector<int>& flags,
+                vector<vector<double>>& monitoring,
+                int& Nb_monitored,
+                vector<vector<double>>& Monitored)
 {
     double Dwork = 0. ;
     double Elastic_energy = 0. ;
     double Kinetic_energy = 0. ;
-    double px , py , length , vx , vy ;
-    vector<double> current_monitoring = { (double)Number_iteration , Time , Deltat , (double)neval , (double)max_error , (double)mean_error } ;
+    double px, py, length, vx, vy ;
+    vector<double> current_monitoring = { (double)Number_iteration, Time, Deltat, (double)neval, (double)max_error, (double)mean_error } ;
 
     //cout << "nb monitored " << Nb_monitored << endl ;
     double x ;
@@ -62,9 +62,12 @@ void Monitoring(int Nb_bodies ,
                     r = Bodies[Monitored[i][2]].r_current ;
                 }
             }
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(r) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(x) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(y) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(r) ;
         }
         else if (Monitored[i][0] == 1)
         {
@@ -97,10 +100,14 @@ void Monitoring(int Nb_bodies ,
                     r = Bodies[Monitored[i][2]].r_displacement ;
                 }
             }
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-            else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(x) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(y) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+            else if (Monitored[i][1] == 3)
+                current_monitoring.push_back(r) ;
         }
         else if (Monitored[i][0] == 2)
         {
@@ -133,10 +140,14 @@ void Monitoring(int Nb_bodies ,
                     r = Bodies[Monitored[i][2]].r_velocity ;
                 }
             }
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-            else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(x) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(y) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+            else if (Monitored[i][1] == 3)
+                current_monitoring.push_back(r) ;
         }
         else if (Monitored[i][0] == 3)
         {
@@ -169,10 +180,14 @@ void Monitoring(int Nb_bodies ,
                     r = Bodies[Monitored[i][2]].r_acceleration ;
                 }
             }
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-            else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(x) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(y) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+            else if (Monitored[i][1] == 3)
+                current_monitoring.push_back(r) ;
         }
         else if (Monitored[i][0] == 4)
         {
@@ -310,24 +325,38 @@ void Monitoring(int Nb_bodies ,
                     }
                 }
             }
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-            else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(x) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(y) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+            else if (Monitored[i][1] == 3)
+                current_monitoring.push_back(r) ;
         }
-        else if (Monitored[i][0] == 5)          current_monitoring.push_back(Bodies[Monitored[i][1]].nodes[Monitored[i][2]].jacobian) ;
+        else if (Monitored[i][0] == 5)
+            current_monitoring.push_back(Bodies[Monitored[i][1]].nodes[Monitored[i][2]].jacobian) ;
         else if (Monitored[i][0] == 6)
         {
             //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << Monitored[i][3] << endl ;
-            if (Monitored[i][1] == 0)           current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxx) ;
-            else if (Monitored[i][1] == 1)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmayy) ;
-            else if (Monitored[i][1] == 2)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxy) ;
-            else if (Monitored[i][1] == 3)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmazz) ;
-            else if (Monitored[i][1] == 4)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaTresca) ;
-            else if (Monitored[i][1] == 5)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaVM) ;
-            else if (Monitored[i][1] == 6)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaI) ;
-            else if (Monitored[i][1] == 7)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaII) ;
-            else if (Monitored[i][1] == 8)      current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaIII) ;
+            if (Monitored[i][1] == 0)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxx) ;
+            else if (Monitored[i][1] == 1)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmayy) ;
+            else if (Monitored[i][1] == 2)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxy) ;
+            else if (Monitored[i][1] == 3)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmazz) ;
+            else if (Monitored[i][1] == 4)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaTresca) ;
+            else if (Monitored[i][1] == 5)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaVM) ;
+            else if (Monitored[i][1] == 6)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaI) ;
+            else if (Monitored[i][1] == 7)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaII) ;
+            else if (Monitored[i][1] == 8)
+                current_monitoring.push_back(Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaIII) ;
         }
         else if (Monitored[i][0] == 7)
         {
@@ -336,12 +365,18 @@ void Monitoring(int Nb_bodies ,
             {
                 if (Bodies[Monitored[i][2]].contact_elements[j].borderS == Monitored[i][3] && Bodies[Monitored[i][2]].contact_elements[j].border_nodeS == Monitored[i][4])
                 {
-                    if (Monitored[i][1] == 0)           current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].gapn) ;
-                    else if (Monitored[i][1] == 1)      current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].gapt) ;
-                    else if (Monitored[i][1] == 2)      current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].xsi) ;
-                    else if (Monitored[i][1] == 3)      current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].xnorm) ;
-                    else if (Monitored[i][1] == 4)      current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].ynorm) ;
-                    else if (Monitored[i][1] == 5)      current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].internal[0]) ;
+                    if (Monitored[i][1] == 0)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].gapn) ;
+                    else if (Monitored[i][1] == 1)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].gapt) ;
+                    else if (Monitored[i][1] == 2)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].xsi) ;
+                    else if (Monitored[i][1] == 3)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].xnorm) ;
+                    else if (Monitored[i][1] == 4)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].ynorm) ;
+                    else if (Monitored[i][1] == 5)
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_elements[j].internal[0]) ;
                     break ;
                 }
             }
@@ -429,26 +464,40 @@ void Monitoring(int Nb_bodies ,
             //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << endl ;
             if (Monitored[i][2] >=0 )
             {
-                if (Monitored[i][1] == 0 )               current_monitoring.push_back(Bodies[Monitored[i][2]].internal_work) ;
-                else if (Monitored[i][1] == 1 )          current_monitoring.push_back(Bodies[Monitored[i][2]].contact_work) ;
-                else if (Monitored[i][1] == 2 )          current_monitoring.push_back(Bodies[Monitored[i][2]].body_work) ;
-                else if (Monitored[i][1] == 3 )          current_monitoring.push_back(Bodies[Monitored[i][2]].dirichlet_work) ;
-                else if (Monitored[i][1] == 4 )          current_monitoring.push_back(Bodies[Monitored[i][2]].neumann_work) ;
-                else if (Monitored[i][1] == 5 )          current_monitoring.push_back(Bodies[Monitored[i][2]].damping_work) ;
-                else if (Monitored[i][1] == 6 )          current_monitoring.push_back(Bodies[Monitored[i][2]].alid_work) ;
+                if (Monitored[i][1] == 0 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].internal_work) ;
+                else if (Monitored[i][1] == 1 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].contact_work) ;
+                else if (Monitored[i][1] == 2 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].body_work) ;
+                else if (Monitored[i][1] == 3 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].dirichlet_work) ;
+                else if (Monitored[i][1] == 4 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].neumann_work) ;
+                else if (Monitored[i][1] == 5 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].damping_work) ;
+                else if (Monitored[i][1] == 6 )
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].alid_work) ;
             }
             else if (Monitored[i][2] == -1 )
             {
                 x = 0. ;
                 for (int n=0 ; n<Nb_bodies ; n++)
                 {
-                    if (Monitored[i][1] == 0 )           x += Bodies[n].internal_work ;
-                    else if (Monitored[i][1] == 1 )      x += Bodies[n].contact_work ;
-                    else if (Monitored[i][1] == 2 )      x += Bodies[n].body_work ;
-                    else if (Monitored[i][1] == 3 )      x += Bodies[n].dirichlet_work ;
-                    else if (Monitored[i][1] == 4 )      x += Bodies[n].neumann_work ;
-                    else if (Monitored[i][1] == 5 )      x += Bodies[n].damping_work ;
-                    else if (Monitored[i][1] == 6 )      x += Bodies[n].alid_work ;
+                    if (Monitored[i][1] == 0 )
+                        x += Bodies[n].internal_work ;
+                    else if (Monitored[i][1] == 1 )
+                        x += Bodies[n].contact_work ;
+                    else if (Monitored[i][1] == 2 )
+                        x += Bodies[n].body_work ;
+                    else if (Monitored[i][1] == 3 )
+                        x += Bodies[n].dirichlet_work ;
+                    else if (Monitored[i][1] == 4 )
+                        x += Bodies[n].neumann_work ;
+                    else if (Monitored[i][1] == 5 )
+                        x += Bodies[n].damping_work ;
+                    else if (Monitored[i][1] == 6 )
+                        x += Bodies[n].alid_work ;
                 }
                 current_monitoring.push_back(x) ;
             }
@@ -488,7 +537,7 @@ void Monitoring(int Nb_bodies ,
 
     if (flags[2]==1)
     {
-        double fx0 , fy0 , fx1 , fy1 ;
+        double fx0, fy0, fx1, fy1 ;
         for (int i=0 ; i<Bodies[0].borders[0].number_border_nodes ; i++)
         {
             fx0 += Bodies[0].borders[0].x_bc_pressure[i]*Bodies[0].borders[0].length[i] ;
@@ -514,24 +563,25 @@ void Monitoring(int Nb_bodies ,
 //** SPYING **********************************//
 //********************************************//
 
-void Spying(int Nb_bodies ,
-	vector<Body>& Bodies ,
-	double Time ,
-	double& Deltat ,
-	int& Number_iteration ,
-    vector<vector<vector<double>>>& spying ,
-    int& Nb_spies ,
-    vector<Spy>& Spies ,
-    double Xmin_period ,
-    double Xmax_period)
+void Spying(int Nb_bodies,
+            vector<Body>& Bodies,
+            double Time,
+            double& Deltat,
+            int& Number_iteration,
+            vector<vector<vector<double>>>& spying,
+            int& Nb_spies,
+            vector<Spy>& Spies,
+            double Xmin_period,
+            double Xmax_period)
 {
     for (int n(0) ; n < Nb_spies ; n++)
     {
-        if ( Time < Spies[n].next_time-1.e-6*Deltat ) continue ;
+        if ( Time < Spies[n].next_time-1.e-6*Deltat )
+            continue ;
         Spies[n].next_time += Spies[n].period ;
         int nb_quantities = Spies[n].nb_quantities ;
         vector<vector<double>> Monitored = Spies[n].quantities ;
-        vector<double> current_monitoring = { (double)Number_iteration , Time } ;
+        vector<double> current_monitoring = { (double)Number_iteration, Time } ;
         double x ;
         double y ;
         double r ;
@@ -545,7 +595,8 @@ void Spying(int Nb_bodies ,
                 {
                     for (int j(0) ; j < Nb_bodies ; j++)
                     {
-                        for (int k(0) ; k < Bodies[j].nb_nodes ; k++) current_monitoring.push_back(Bodies[j].nodes[k].x_current) ;
+                        for (int k(0) ; k < Bodies[j].nb_nodes ; k++)
+                            current_monitoring.push_back(Bodies[j].nodes[k].x_current) ;
                     }
                     continue ;
                 }
@@ -553,7 +604,8 @@ void Spying(int Nb_bodies ,
                 {
                     for (int j(0) ; j < Nb_bodies ; j++)
                     {
-                        for (int k(0) ; k < Bodies[j].nb_nodes ; k++) current_monitoring.push_back(Bodies[j].nodes[k].y_current) ;
+                        for (int k(0) ; k < Bodies[j].nb_nodes ; k++)
+                            current_monitoring.push_back(Bodies[j].nodes[k].y_current) ;
                     }
                     continue ;
                 }
@@ -586,9 +638,12 @@ void Spying(int Nb_bodies ,
                         r = Bodies[Monitored[i][2]].r_current ;
                     }
                 }
-                if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-                else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-                else if (Monitored[i][1] == 2)      current_monitoring.push_back(r) ;
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(r) ;
                 else if (Monitored[i][1] == 3)
                 {
                     double l = 0. ;
@@ -616,8 +671,8 @@ void Spying(int Nb_bodies ,
                 else if (Monitored[i][1] == 5)
                 {
                     double a = 0. ;
-                    double x1 , x2 , y1 , y2 ;
-                    int n1 , n2 ;
+                    double x1, x2, y1, y2 ;
+                    int n1, n2 ;
                     //double y0 = 1.e10 ;
                     //for (int j(0) ; j<Bodies[Monitored[i][2]].nb_nodes ; j++)
                     //{
@@ -683,10 +738,14 @@ void Spying(int Nb_bodies ,
                         r = Bodies[Monitored[i][2]].r_displacement ;
                     }
                 }
-                if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-                else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-                else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-                else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(r) ;
             }
             else if (Monitored[i][0] == 2)
             {
@@ -719,10 +778,14 @@ void Spying(int Nb_bodies ,
                         r = Bodies[Monitored[i][2]].r_velocity ;
                     }
                 }
-                if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-                else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-                else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-                else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(r) ;
             }
             else if (Monitored[i][0] == 3)
             {
@@ -755,10 +818,14 @@ void Spying(int Nb_bodies ,
                         r = Bodies[Monitored[i][2]].r_acceleration ;
                     }
                 }
-                if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-                else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-                else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-                else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(r) ;
             }
             else if (Monitored[i][0] == 4)
             {
@@ -896,28 +963,43 @@ void Spying(int Nb_bodies ,
                         }
                     }
                 }
-                if (Monitored[i][1] == 0)           current_monitoring.push_back(x) ;
-                else if (Monitored[i][1] == 1)      current_monitoring.push_back(y) ;
-                else if (Monitored[i][1] == 2)      current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
-                else if (Monitored[i][1] == 3)      current_monitoring.push_back(r) ;
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(r) ;
             }
-            else if (Monitored[i][0] == 5)          current_monitoring.push_back(Bodies[Monitored[i][1]].nodes[Monitored[i][2]].jacobian) ;
+            else if (Monitored[i][0] == 5)
+                current_monitoring.push_back(Bodies[Monitored[i][1]].nodes[Monitored[i][2]].jacobian) ;
             else if (Monitored[i][0] == 6)
             {
                 //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << Monitored[i][3] << endl ;
-                double s , m ;
+                double s, m ;
                 if  (Monitored[i][3] >= 0)
                 {
-                    if (Monitored[i][1] == 0)           s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxx ;
-                    else if (Monitored[i][1] == 1)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmayy ;
-                    else if (Monitored[i][1] == 2)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxy ;
-                    else if (Monitored[i][1] == 3)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmazz ;
-                    else if (Monitored[i][1] == 4)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaTresca ;
-                    else if (Monitored[i][1] == 5)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaVM ;
-                    else if (Monitored[i][1] == 6)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaI ;
-                    else if (Monitored[i][1] == 7)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaII ;
-                    else if (Monitored[i][1] == 8)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaIII ;
-                    else if (Monitored[i][1] == 9)      s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaSph ;
+                    if (Monitored[i][1] == 0)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxx ;
+                    else if (Monitored[i][1] == 1)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmayy ;
+                    else if (Monitored[i][1] == 2)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmaxy ;
+                    else if (Monitored[i][1] == 3)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].Sigmazz ;
+                    else if (Monitored[i][1] == 4)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaTresca ;
+                    else if (Monitored[i][1] == 5)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaVM ;
+                    else if (Monitored[i][1] == 6)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaI ;
+                    else if (Monitored[i][1] == 7)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaII ;
+                    else if (Monitored[i][1] == 8)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaIII ;
+                    else if (Monitored[i][1] == 9)
+                        s = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].SigmaSph ;
                 }
                 else
                 {
@@ -925,16 +1007,26 @@ void Spying(int Nb_bodies ,
                     m = 0. ;
                     for (int j(0) ; j<Bodies[Monitored[i][2]].nb_nodes ; j++)
                     {
-                        if (Monitored[i][1] == 0)           s += Bodies[Monitored[i][2]].nodes[j].Sigmaxx * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 1)      s += Bodies[Monitored[i][2]].nodes[j].Sigmayy * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 2)      s += Bodies[Monitored[i][2]].nodes[j].Sigmaxy * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 3)      s += Bodies[Monitored[i][2]].nodes[j].Sigmazz * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 4)      s += Bodies[Monitored[i][2]].nodes[j].SigmaTresca * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 5)      s += Bodies[Monitored[i][2]].nodes[j].SigmaVM * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 6)      s += Bodies[Monitored[i][2]].nodes[j].SigmaI * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 7)      s += Bodies[Monitored[i][2]].nodes[j].SigmaII * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 8)      s += Bodies[Monitored[i][2]].nodes[j].SigmaIII * Bodies[Monitored[i][2]].nodes[j].x_mass ;
-                        else if (Monitored[i][1] == 9)      s += Bodies[Monitored[i][2]].nodes[j].SigmaSph * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        if (Monitored[i][1] == 0)
+                            s += Bodies[Monitored[i][2]].nodes[j].Sigmaxx * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 1)
+                            s += Bodies[Monitored[i][2]].nodes[j].Sigmayy * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 2)
+                            s += Bodies[Monitored[i][2]].nodes[j].Sigmaxy * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 3)
+                            s += Bodies[Monitored[i][2]].nodes[j].Sigmazz * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 4)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaTresca * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 5)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaVM * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 6)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaI * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 7)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaII * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 8)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaIII * Bodies[Monitored[i][2]].nodes[j].x_mass ;
+                        else if (Monitored[i][1] == 9)
+                            s += Bodies[Monitored[i][2]].nodes[j].SigmaSph * Bodies[Monitored[i][2]].nodes[j].x_mass ;
                         m += Bodies[Monitored[i][2]].nodes[j].x_mass ;
                     }
                     s = s / m ;
@@ -1184,8 +1276,10 @@ void Spying(int Nb_bodies ,
                         }
                     }
                 }
-                else if (Monitored[i][1] == 10) current_monitoring.push_back(Bodies[Monitored[i][2]].borders[Monitored[i][3]].x_contact_pressure[Monitored[i][4]]) ;
-                else if (Monitored[i][1] == 11) current_monitoring.push_back(Bodies[Monitored[i][2]].borders[Monitored[i][3]].y_contact_pressure[Monitored[i][4]]) ;
+                else if (Monitored[i][1] == 10)
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].borders[Monitored[i][3]].x_contact_pressure[Monitored[i][4]]) ;
+                else if (Monitored[i][1] == 11)
+                    current_monitoring.push_back(Bodies[Monitored[i][2]].borders[Monitored[i][3]].y_contact_pressure[Monitored[i][4]]) ;
                 else if (Monitored[i][1] == 12)
                 {
                     double q = 0. ;
@@ -1364,26 +1458,40 @@ void Spying(int Nb_bodies ,
                 //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << endl ;
                 if (Monitored[i][2] >=0 )
                 {
-                    if (Monitored[i][1] == 0 )               current_monitoring.push_back(Bodies[Monitored[i][2]].internal_work) ;
-                    else if (Monitored[i][1] == 1 )          current_monitoring.push_back(Bodies[Monitored[i][2]].contact_work) ;
-                    else if (Monitored[i][1] == 2 )          current_monitoring.push_back(Bodies[Monitored[i][2]].body_work) ;
-                    else if (Monitored[i][1] == 3 )          current_monitoring.push_back(Bodies[Monitored[i][2]].dirichlet_work) ;
-                    else if (Monitored[i][1] == 4 )          current_monitoring.push_back(Bodies[Monitored[i][2]].neumann_work) ;
-                    else if (Monitored[i][1] == 5 )          current_monitoring.push_back(Bodies[Monitored[i][2]].damping_work) ;
-                    else if (Monitored[i][1] == 6 )          current_monitoring.push_back(Bodies[Monitored[i][2]].alid_work) ;
+                    if (Monitored[i][1] == 0 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].internal_work) ;
+                    else if (Monitored[i][1] == 1 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].contact_work) ;
+                    else if (Monitored[i][1] == 2 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].body_work) ;
+                    else if (Monitored[i][1] == 3 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].dirichlet_work) ;
+                    else if (Monitored[i][1] == 4 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].neumann_work) ;
+                    else if (Monitored[i][1] == 5 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].damping_work) ;
+                    else if (Monitored[i][1] == 6 )
+                        current_monitoring.push_back(Bodies[Monitored[i][2]].alid_work) ;
                 }
                 else if (Monitored[i][2] == -1 )
                 {
                     x = 0. ;
                     for (int n=0 ; n<Nb_bodies ; n++)
                     {
-                        if (Monitored[i][1] == 0 )           x += Bodies[n].internal_work ;
-                        else if (Monitored[i][1] == 1 )      x += Bodies[n].contact_work ;
-                        else if (Monitored[i][1] == 2 )      x += Bodies[n].body_work ;
-                        else if (Monitored[i][1] == 3 )      x += Bodies[n].dirichlet_work ;
-                        else if (Monitored[i][1] == 4 )      x += Bodies[n].neumann_work ;
-                        else if (Monitored[i][1] == 5 )      x += Bodies[n].damping_work ;
-                        else if (Monitored[i][1] == 6 )      x += Bodies[n].alid_work ;
+                        if (Monitored[i][1] == 0 )
+                            x += Bodies[n].internal_work ;
+                        else if (Monitored[i][1] == 1 )
+                            x += Bodies[n].contact_work ;
+                        else if (Monitored[i][1] == 2 )
+                            x += Bodies[n].body_work ;
+                        else if (Monitored[i][1] == 3 )
+                            x += Bodies[n].dirichlet_work ;
+                        else if (Monitored[i][1] == 4 )
+                            x += Bodies[n].neumann_work ;
+                        else if (Monitored[i][1] == 5 )
+                            x += Bodies[n].damping_work ;
+                        else if (Monitored[i][1] == 6 )
+                            x += Bodies[n].alid_work ;
                     }
                     current_monitoring.push_back(x) ;
                 }
@@ -1393,25 +1501,30 @@ void Spying(int Nb_bodies ,
                 int n = Monitored[i][2] ;
                 double interval = 3.141592653589793 / n ;
                 vector<double> Bins(n) ;
-                int inbin , nc ;
+                int inbin, nc ;
                 double period = Xmax_period - Xmin_period ;
-                double angle , fx , fy , xs , ys ;
+                double angle, fx, fy, xs, ys ;
                 nc = 0 ;
-                for (int k=0 ; k<n ; k++)   Bins[k] = 0. ;
+                for (int k=0 ; k<n ; k++)
+                    Bins[k] = 0. ;
                 for (int k=0 ; k<Nb_bodies ; k++)
                 {
-                    if (Bodies[k].status == "inactive") continue ;
+                    if (Bodies[k].status == "inactive")
+                        continue ;
                     xs = Bodies[k].x_current - period * floor( ( Bodies[k].x_current - Xmin_period ) / period ) ; ;
                     ys = Bodies[k].y_current ;
-                    if ((xs<Monitored[i][3]) || (xs>Monitored[i][4]) || (xs<Monitored[i][5]) || (xs>Monitored[i][6])) continue ;
+                    if ((xs<Monitored[i][3]) || (xs>Monitored[i][4]) || (xs<Monitored[i][5]) || (xs>Monitored[i][6]))
+                        continue ;
                     for (int j=0 ; j<Bodies[k].nb_contact_elements ; j++)
                     {
                         fx = Bodies[k].contact_elements[j].fx ;
                         fy = Bodies[k].contact_elements[j].fy ;
-                        if ((fx == 0.) && (fy == 0.))   continue ;
+                        if ((fx == 0.) && (fy == 0.))
+                            continue ;
                         nc++ ;
                         angle = atan(Bodies[k].contact_elements[j].ynorm/Bodies[k].contact_elements[j].xnorm) ;
-                        if (angle<0.)   angle = angle + 3.141592653589793 ;
+                        if (angle<0.)
+                            angle = angle + 3.141592653589793 ;
                         inbin = (int) floor(angle / interval) ;
                         Bins[inbin] = Bins[inbin] + 1. ;
                     }

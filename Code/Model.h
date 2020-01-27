@@ -16,16 +16,16 @@
 //	Sig[2][2] = Lambda * (J - 1.) ;
 //	energy = 0. ;
 //}
-void Apply_Elastic_Linear(double& S11 , double& S12 , double& S22 , double& S33 , double& E11 , double& E12 , double& E22 , double Mu , double Lambda , double& J , double& energy)
+void Apply_Elastic_Linear(double& S11, double& S12, double& S22, double& S33, double& E11, double& E12, double& E22, double Mu, double Lambda, double& J, double& energy)
 {
     // OPTIMIZED
-	J = 1. + E11 + E22 ;
-	S33 = Lambda * (J - 1.) ;
-	Mu = 2 * Mu ;
-	S11 = S33 + Mu * E11 ;
-	S22 = S33 + Mu * E22 ;
+    J = 1. + E11 + E22 ;
+    S33 = Lambda * (J - 1.) ;
+    Mu = 2 * Mu ;
+    S11 = S33 + Mu * E11 ;
+    S22 = S33 + Mu * E22 ;
     S12 = Mu * E12;
-	energy = 0. ;
+    energy = 0. ;
 }
 
 
@@ -49,27 +49,27 @@ void Apply_Elastic_Linear(double& S11 , double& S12 , double& S22 , double& S33 
 //	S[2][2] = ( Kappa * (J - 1.) + MuJ53 * ( 1. - trBover3 ) ) * J ;
 //	energy = 0. ;
 //}
-void Apply_NeoHookean(double& S11 , double& S12 , double& S22 , double& S33 , double& F11 , double& F12 , double& F21 , double& F22 , double Mu , double Kappa , double& J , double& energy)
+void Apply_NeoHookean(double& S11, double& S12, double& S22, double& S33, double& F11, double& F12, double& F21, double& F22, double Mu, double Kappa, double& J, double& energy)
 {
     // OPTIMIZED
     double F11F12 = F11 * F11 + F12 * F12 ;
     double F21F22 = F21 * F21 + F22 * F22 ;
 
-	J = F11 * F22 - F12 * F21 ;
-	double invJ = 1. / J ;
-	double K = Kappa * (J - 1.) ;
+    J = F11 * F22 - F12 * F21 ;
+    double invJ = 1. / J ;
+    double K = Kappa * (J - 1.) ;
 
-	double MuJ53 = Mu * pow( J , -1.666666666667 ) ;
-	double trBover3 = 0.333333333333 * ( F11F12 + F21F22 + 1. ) ;
-	double sig11 = K + MuJ53 * ( F11F12 - trBover3 ) ;
-	double sig22 = K + MuJ53 * ( F21F22 - trBover3 ) ;
-	double sig12 = MuJ53 * ( F11 * F21 + F12 * F22 ) ;
+    double MuJ53 = Mu * pow( J, -1.666666666667 ) ;
+    double trBover3 = 0.333333333333 * ( F11F12 + F21F22 + 1. ) ;
+    double sig11 = K + MuJ53 * ( F11F12 - trBover3 ) ;
+    double sig22 = K + MuJ53 * ( F21F22 - trBover3 ) ;
+    double sig12 = MuJ53 * ( F11 * F21 + F12 * F22 ) ;
 
-	S11 = ( F12 * ( F12 * sig22 - F22 * sig12 ) - F22 * ( F12 * sig12 - F22 * sig11 ) ) * invJ ;
-	S22 = ( F11 * ( F11 * sig22 - F21 * sig12 ) - F21 * ( F11 * sig12 - F21 * sig11 ) ) * invJ ;
+    S11 = ( F12 * ( F12 * sig22 - F22 * sig12 ) - F22 * ( F12 * sig12 - F22 * sig11 ) ) * invJ ;
+    S22 = ( F11 * ( F11 * sig22 - F21 * sig12 ) - F21 * ( F11 * sig12 - F21 * sig11 ) ) * invJ ;
     S12 = ( F21 * ( F12 * sig12 - F22 * sig11 ) - F11 * ( F12 * sig22 - F22 * sig12 ) ) * invJ ;
-	S33 = ( K + MuJ53 * ( 1. - trBover3 ) ) * J ;
-	energy = 0. ;
+    S33 = ( K + MuJ53 * ( 1. - trBover3 ) ) * J ;
+    energy = 0. ;
 }
 
 
@@ -78,12 +78,14 @@ void Apply_NeoHookean(double& S11 , double& S12 , double& S22 , double& S33 , do
 //** APPLY FRICTIONLESS **********************//
 //********************************************//
 
-void Apply_Frictionless(double kn , double gapn , double& gapt , double& Pn , double& Pt)
+void Apply_Frictionless(double kn, double gapn, double& gapt, double& Pn, double& Pt)
 {
-	if (gapn>0.) Pn = 0. ;
-	else Pn = -kn * gapn ;
-	Pt = 0. ;
-	gapt = 0. ;
+    if (gapn>0.)
+        Pn = 0. ;
+    else
+        Pn = -kn * gapn ;
+    Pt = 0. ;
+    gapt = 0. ;
 }
 
 
@@ -92,22 +94,24 @@ void Apply_Frictionless(double kn , double gapn , double& gapt , double& Pn , do
 //** APPLY COHESION **************************//
 //********************************************//
 
-void Apply_Cohesion(double kn , double kt , double gtang , double gtens , double gapn , double& gapt , double& Pn , double& Pt)
+void Apply_Cohesion(double kn, double kt, double gtang, double gtens, double gapn, double& gapt, double& Pn, double& Pt)
 {
-	Pn = -kn * gapn ;
-	Pt = -kt * gapt ;
-	if (Pn<-gtens)
-	{
-		Pn = 0. ;
-		Pt = 0. ;
-		gapt = 0. ;
-	}
-	else if (abs(Pt)>gtang)
-	{
-		if (gapt>0.) Pt = -gtang ;
-		else Pt = gtang ;
-		gapt = -Pt / kt ;
-	}
+    Pn = -kn * gapn ;
+    Pt = -kt * gapt ;
+    if (Pn<-gtens)
+    {
+        Pn = 0. ;
+        Pt = 0. ;
+        gapt = 0. ;
+    }
+    else if (abs(Pt)>gtang)
+    {
+        if (gapt>0.)
+            Pt = -gtang ;
+        else
+            Pt = gtang ;
+        gapt = -Pt / kt ;
+    }
 }
 
 
@@ -116,22 +120,24 @@ void Apply_Cohesion(double kn , double kt , double gtang , double gtens , double
 //** APPLY MOHR COULOMB **********************//
 //********************************************//
 
-void Apply_Mohr_Coulomb(double kn , double kt , double fric , double coh , double tens , double gapn , double& gapt , double& Pn , double& Pt)
+void Apply_Mohr_Coulomb(double kn, double kt, double fric, double coh, double tens, double gapn, double& gapt, double& Pn, double& Pt)
 {
-	Pn = -kn * gapn ;
-	Pt = -kt * gapt ;
-	if (Pn<-tens)
-	{
-		Pn = 0. ;
-		Pt = 0. ;
-		gapt = 0. ;
-	}
-	else if (abs(Pt)>coh+fric*Pn)
-	{
-		if (gapt>0.) Pt = -coh - fric * Pn ;
-		else Pt = coh + fric * Pn ;
-		gapt = -Pt / kt ;
-	}
+    Pn = -kn * gapn ;
+    Pt = -kt * gapt ;
+    if (Pn<-tens)
+    {
+        Pn = 0. ;
+        Pt = 0. ;
+        gapt = 0. ;
+    }
+    else if (abs(Pt)>coh+fric*Pn)
+    {
+        if (gapt>0.)
+            Pt = -coh - fric * Pn ;
+        else
+            Pt = coh + fric * Pn ;
+        gapt = -Pt / kt ;
+    }
 }
 
 
@@ -140,34 +146,37 @@ void Apply_Mohr_Coulomb(double kn , double kt , double fric , double coh , doubl
 //** APPLY DAMPED MOHR COULOMB ***************//
 //********************************************//
 
-void Apply_Damped_Mohr_Coulomb(double kn , double kt , double fric , double coh , double tens , double damp , double mass , double length , double gapn , double vgapn , double& gapt , double vgapt , double& Pn , double& Pt , double& W)
+void Apply_Damped_Mohr_Coulomb(double kn, double kt, double fric, double coh, double tens, double damp, double mass, double length, double gapn, double vgapn, double& gapt, double vgapt, double& Pn, double& Pt, double& W)
 {
-	Pn = 0. ;
-	if (gapn<0.)
+    Pn = 0. ;
+    if (gapn<0.)
     {
         Pn = -damp * vgapn * 2. * sqrt(mass * kn / length) ;
         W += Pn * vgapn ;   // This is per unit time and per unit length : must be multiplied by length and deltat after returned
     }
     Pn -= kn * gapn ;
-	if (Pn<-tens)
-	{
-		Pn = 0. ;
-		Pt = 0. ;
-		gapt = 0. ;
-	}
-	else
-	{
-	    double Pt_damp = - damp * vgapt * 2. * sqrt(mass * kt / length) ;
-	    Pt = -kt * gapt + Pt_damp ;
-	    if (abs(Pt)>coh+fric*Pn)
+    if (Pn<-tens)
+    {
+        Pn = 0. ;
+        Pt = 0. ;
+        gapt = 0. ;
+    }
+    else
+    {
+        double Pt_damp = - damp * vgapt * 2. * sqrt(mass * kt / length) ;
+        Pt = -kt * gapt + Pt_damp ;
+        if (abs(Pt)>coh+fric*Pn)
         {
-            if (gapt>0.)    Pt = -coh - fric * Pn ;
-            else            Pt = coh + fric * Pn ;
+            if (gapt>0.)
+                Pt = -coh - fric * Pn ;
+            else
+                Pt = coh + fric * Pn ;
             gapt = -Pt / kt ;
             W += Pt * vgapt ;            // This is per unit time and per unit length : must be multiplied by length and deltat after returned
         }
-        else    W += Pt_damp * vgapt ;   // This is per unit time and per unit length : must be multiplied by length and deltat after returned
-	}
+        else
+            W += Pt_damp * vgapt ;   // This is per unit time and per unit length : must be multiplied by length and deltat after returned
+    }
 }
 
 /*
@@ -200,32 +209,36 @@ void Apply_Damped_Mohr_Coulomb(double kn , double kt , double fric , double coh 
 //** APPLY TWO SLOPES MOHR COULOMB ***************//
 //************************************************//
 
-void Apply_Two_Slopes_Mohr_Coulomb(double kn , double kt , double fric , double coh , double tens , double rati , double gapn , double vgapn , double& gapt , double vgapt , double& Pn , double& Pt)
+void Apply_Two_Slopes_Mohr_Coulomb(double kn, double kt, double fric, double coh, double tens, double rati, double gapn, double vgapn, double& gapt, double vgapt, double& Pn, double& Pt)
 {
-    if (vgapn <= 0.) Pn = -kn * gapn ;
-    else             Pn = -kn * gapn * rati ;
-	if (Pn < -tens)
-	{
-		Pn = 0. ;
-		Pt = 0. ;
-		gapt = 0. ;
-	}
-	else
-	{
-	    //if (vgapt * gapt > 0.) Pt = -kt * gapt ;
-	    //else                   Pt = -kt * gapt * rati ;
-	    Pt = -kt * gapt ;
-	    //
+    if (vgapn <= 0.)
+        Pn = -kn * gapn ;
+    else
+        Pn = -kn * gapn * rati ;
+    if (Pn < -tens)
+    {
+        Pn = 0. ;
+        Pt = 0. ;
+        gapt = 0. ;
+    }
+    else
+    {
+        //if (vgapt * gapt > 0.) Pt = -kt * gapt ;
+        //else                   Pt = -kt * gapt * rati ;
+        Pt = -kt * gapt ;
+        //
         if (abs(Pt) > coh + fric * Pn)
         {
-            if (gapt > 0.) Pt = -coh - fric * Pn ;
-            else Pt = coh + fric * Pn ;
+            if (gapt > 0.)
+                Pt = -coh - fric * Pn ;
+            else
+                Pt = coh + fric * Pn ;
             //if (vgapt * gapt > 0.) gapt = -Pt / kt ;
             //else                   gapt = -Pt / (kt * rati) ;
             gapt = -Pt / kt ;
             //
         }
-	}
+    }
 }
 
 
@@ -234,7 +247,7 @@ void Apply_Two_Slopes_Mohr_Coulomb(double kn , double kt , double fric , double 
 //** APPLY CZM LINEAR ************************//
 //********************************************//
 
-void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres , double NTratio , double gapn , double& gapt , double& Damage , double& Pn , double& Pt)
+void Apply_CZM_linear(double kini, double Pnlim, double gapnlim, double Pnres, double NTratio, double gapn, double& gapt, double& Damage, double& Pn, double& Pt)
 {
     if (Damage >= 1.)
     {
@@ -249,8 +262,10 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
         }
         else if (abs(Pt) > Pnres * NTratio)
         {
-            if (gapt>0.) Pt = -Pnres * NTratio ;
-            else Pt = Pnres * NTratio ;
+            if (gapt>0.)
+                Pt = -Pnres * NTratio ;
+            else
+                Pt = Pnres * NTratio ;
             gapt = -Pt / kini ;
         }
     }
@@ -263,8 +278,10 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
         {
             // Elastic part of the bond
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
         else if (gapn > gapnmax && abs(gapt) < gaptmax)
@@ -274,8 +291,10 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
             gaptmax = gapnmax * NTratio ;
             Damage = (gapnmax - Pnlim / kini) / (gapnlim - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
         else if (gapn < gapnmax && abs(gapt) > gaptmax)
@@ -285,8 +304,10 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
             gapnmax = gaptmax / NTratio ;
             Damage = (gapnmax - Pnlim / kini) / (gapnlim - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
         else if (gapn > gapnmax && abs(gapt) > gaptmax)
@@ -304,8 +325,10 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
             }
             Damage = (gapnmax - Pnlim / kini) / (gapnlim - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
     }
@@ -317,7 +340,7 @@ void Apply_CZM_linear(double kini , double Pnlim , double gapnlim , double Pnres
 //** APPLY CZM FATIGUE ***********************//
 //********************************************//
 
-void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnres , double NTratio , double Pnfat, double Raten, double Ratet , double gapn , double& gapt , double& Damage , double& Pn , double& Pt)
+void Apply_CZM_fatigue(double kini, double Pnlim, double gapnres, double Pnres, double NTratio, double Pnfat, double Raten, double Ratet, double gapn, double& gapt, double& Damage, double& Pn, double& Pt)
 {
     if (Damage < 1.)
     {
@@ -330,8 +353,10 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
             double Pnm = Pn ;
             double Ptm = Pt ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
             double Pnmax = Pnlim * ( 1. - Damage ) + Pnres * Damage ;
             //double Pnfat = Degratio * Pnlim ;
@@ -355,8 +380,10 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
             gaptmax = gapnmax * NTratio ;
             Damage = (gapnmax - Pnlim / kini) / (gapnres - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
         else if (gapn < gapnmax && abs(gapt) > gaptmax)
@@ -366,8 +393,10 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
             gapnmax = gaptmax / NTratio ;
             Damage = (gapnmax - Pnlim / kini) / (gapnres - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
         else if (gapn > gapnmax && abs(gapt) > gaptmax)
@@ -385,8 +414,10 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
             }
             Damage = (gapnmax - Pnlim / kini) / (gapnres - Pnlim / kini) ;
             kmax = (Pnlim * (1. - Damage) + Pnres * Damage) / gapnmax ;
-            if (gapn<0.)    Pn = -kini * gapn ;
-            else            Pn = -kmax * gapn ;
+            if (gapn<0.)
+                Pn = -kini * gapn ;
+            else
+                Pn = -kmax * gapn ;
             Pt = -kmax * gapt ;
         }
     }
@@ -404,8 +435,10 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
         }
         else if (abs(Pt) > Pnres * NTratio)
         {
-            if (gapt>0.) Pt = -Pnres * NTratio ;
-            else Pt = Pnres * NTratio ;
+            if (gapt>0.)
+                Pt = -Pnres * NTratio ;
+            else
+                Pt = Pnres * NTratio ;
             gapt = -Pt / kini ;
         }
     }
@@ -417,7 +450,7 @@ void Apply_CZM_fatigue(double kini , double Pnlim , double gapnres , double Pnre
 //** APPLY BONDED MOHR COULOMB ***************//
 //********************************************//
 
-void Apply_Bonded_Mohr_Coulomb(double kn , double kt , double kbond , double fricbond , double cohbond , double tensbond , double fricfree , double cohfree , double tensfree , double damp , double mass , double length , double gapn , double vgapn , double& gapt , double vgapt , double& Damage , double& Pn , double& Pt)
+void Apply_Bonded_Mohr_Coulomb(double kn, double kt, double kbond, double fricbond, double cohbond, double tensbond, double fricfree, double cohfree, double tensfree, double damp, double mass, double length, double gapn, double vgapn, double& gapt, double vgapt, double& Damage, double& Pn, double& Pt)
 {
     if (Damage >= 1.)
     {
@@ -435,16 +468,20 @@ void Apply_Bonded_Mohr_Coulomb(double kn , double kt , double kbond , double fri
         }
         if (abs(Pt)>cohfree+fricfree*Pn)
         {
-            if (gapt>0.) Pt = -cohfree - fricfree * Pn ;
-            else Pt = cohfree + fricfree * Pn ;
+            if (gapt>0.)
+                Pt = -cohfree - fricfree * Pn ;
+            else
+                Pt = cohfree + fricfree * Pn ;
             gapt = -Pt / kt ;
         }
     }
     else
     {
         // Bond still active
-        if (gapn<0.)    Pn = -kn * gapn - damp * vgapn * 2. * sqrt(mass * kn / length) ;
-        else            Pn = -kbond * gapn - damp * vgapn * 2. * sqrt(mass * kbond / length) ;
+        if (gapn<0.)
+            Pn = -kn * gapn - damp * vgapn * 2. * sqrt(mass * kn / length) ;
+        else
+            Pn = -kbond * gapn - damp * vgapn * 2. * sqrt(mass * kbond / length) ;
         Pt = -kt * gapt - damp * vgapt * 2. * sqrt(mass * kt / length) ;
         if (Pn<-tensbond)
         {
@@ -459,8 +496,10 @@ void Apply_Bonded_Mohr_Coulomb(double kn , double kt , double kbond , double fri
         if (abs(Pt)>cohbond+fricbond*Pn)
         {
             Damage = 1. ;
-            if (gapt>0.) Pt = -cohfree - fricfree * Pn ;
-            else Pt = cohfree + fricfree * Pn ;
+            if (gapt>0.)
+                Pt = -cohfree - fricfree * Pn ;
+            else
+                Pt = cohfree + fricfree * Pn ;
             gapt = -Pt / kt ;
         }
     }
