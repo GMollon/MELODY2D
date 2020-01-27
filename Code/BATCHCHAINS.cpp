@@ -32,7 +32,7 @@ main(int argc, char **argv)
     vector<Contact_law> Contact_laws ;
     string Solver ;
     double Tini, Deltat, Tend, Time ;
-    double Target_error, Inv_Target_error, Control_parameter, Accepted_ratio ;
+    double Target_error, Control_parameter, Accepted_ratio ;
     double Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling ;
     double Save_period, Print_period, Contact_update_period ;
     double Next_save, Next_print, Next_contact_update ;
@@ -59,7 +59,7 @@ main(int argc, char **argv)
     Load_static( Simulation_name, Nb_materials, Materials,
                  Nb_contact_laws, Contact_laws, Contacts_Table,
                  Solver, Tini,	Deltat, Tend,
-                 Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                 Target_error, Control_parameter, Accepted_ratio,
                  Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
                  Save_period, Print_period, Contact_update_period,
                  Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,

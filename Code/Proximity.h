@@ -554,9 +554,9 @@ void Update_status(
     int Nb_deactivated,
     vector<vector<double>>& Deactivated)
 {
-    double x(0) ;
-    double y(0) ;
-    double r(0) ;
+    double x ;
+    double y ;
+    double r ;
     double m ;
     for (int i(0) ; i < Nb_deactivated ; i++)
     {

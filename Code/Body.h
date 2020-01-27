@@ -172,7 +172,7 @@ public :
     void Update_damping_forces() ;
     void Initialize_contact_forces() ;
     void Update_contacts(vector<Body>& b, double xmin, double xmax) ;
-    void Update_contact_forces(double dt, vector<Body>& b, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax) ;
+    void Update_contact_forces(double& dt, vector<Body>& b, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax) ;
     void Send_contact_forces(vector<Body>& b) ;
     void Sum_up_forces() ;
     void Apply_Newton() ;
@@ -1165,7 +1165,7 @@ void Body::Update_alid_forces(double Time)
         return ;
     else if (flag_alid==0)
         return ;
-    double beta, pvx(0), pvy (0);
+    double beta, pvx, pvy ;
     int flag_alidx, flag_alidy ;
     int nb ;
     double t0, t1, p0, p1 ;
@@ -1638,9 +1638,9 @@ void Body::Update_contacts(vector<Body>& Bodies, double xmin, double xmax)
 //** UPDATE CONTACT FORCES *******************//
 //********************************************//
 
-void Body::Update_contact_forces( double Deltat, vector<Body>& Bodies, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax )
+void Body::Update_contact_forces( double& Deltat, vector<Body>& Bodies, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax )
 {
-    int bodyM, shiftM, borderS, border_nodeS, nodeS, nodeM0, nodeM1, nodeM2, nodeM3, Contact_law_index; // neig ;
+    int bodyM, shiftM, borderS, border_nodeS, nodeS, nodeM0, nodeM1, nodeM2, nodeM3, Contact_law_index, neig ;
     double shapeM0, shapeM1, shapeM2, shapeM3 ;
     double  gapn, vgapn, gapt, vgapt, xnorm, ynorm, xtan, ytan, effective_mass ;
     double Pn, Pt, Px, Py, Fsx(0), Fsy(0), length, initial_length, dx, dy, W ;
@@ -1873,14 +1873,14 @@ void Body::Update_contact_forces( double Deltat, vector<Body>& Bodies, int Nb_co
             r_contact_force += -Fsx * dy + Fsy * dx ;
         }
 
-//        for (int j(0) ; j<Bodies[bodyM].nb_neighbours ; j++)
-//        {
-//            if (Bodies[bodyM].neighbours[j][0] == index)
-//            {
-//                neig = j ;
-//                break ;
-//            }
-//        }
+        for (int j(0) ; j<Bodies[bodyM].nb_neighbours ; j++)
+        {
+            if (Bodies[bodyM].neighbours[j][0] == index)
+            {
+                neig = j ;
+                break ;
+            }
+        }
 
         if (Bodies[bodyM].type=="deformable")
         {

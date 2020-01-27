@@ -73,10 +73,10 @@ main(int argc, char **argv)
     int neval ;
     double max_error, mean_error ;
     double total_mass, max_mass ;
-    int Nb_regions(0) ;
+    int Nb_regions = 0 ;
     vector<vector<int>> Regions ;
     vector<int> flags(9) ;
-    int flag_failure(0) ;
+    int flag_failure = 0 ;
     vector<int> To_Plot(40) ;
     vector<vector<int>> Contacts_Table ;
 
