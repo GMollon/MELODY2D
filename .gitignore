@@ -13,3 +13,4 @@
 *.1
 *.slurm
 *.yml
+*.layout

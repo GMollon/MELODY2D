@@ -1640,7 +1640,7 @@ void Spying(int Nb_bodies,
                 vector<double> Bins(n) ;
                 int inbin, nc ;
                 double period = Xmax_period - Xmin_period ;
-                double angle, fx, fy, xs, ys ;
+                double angle, fx, fy, xs; //ys ;
                 nc = 0 ;
                 for (int k=0 ; k<n ; k++)
                     Bins[k] = 0. ;
@@ -1649,7 +1649,7 @@ void Spying(int Nb_bodies,
                     if (Bodies[k].status == "inactive")
                         continue ;
                     xs = Bodies[k].x_current - period * floor( ( Bodies[k].x_current - Xmin_period ) / period ) ; ;
-                    ys = Bodies[k].y_current ;
+                    //ys = Bodies[k].y_current ;
                     if ((xs<Monitored[i][3]) || (xs>Monitored[i][4]) || (xs<Monitored[i][5]) || (xs>Monitored[i][6]))
                         continue ;
                     for (int j=0 ; j<Bodies[k].nb_contact_elements ; j++)

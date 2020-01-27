@@ -148,7 +148,7 @@ void Solver_step(
         for (int i=0 ; i<Nb_bodies ; i++)
             Bodies[i].Store() ;
     }
-    int bodyformax, nodeformax ;                                                                        // SEQUENTIAL //
+    int bodyformax, nodeformax(0) ;                                                                        // SEQUENTIAL //
     int flag_success = 0 ;                                                                              // SEQUENTIAL //
     neval = 0 ;                                                                                         // SEQUENTIAL //
     while (flag_success == 0)
