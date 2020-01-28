@@ -109,4 +109,3 @@ Contact_element::~Contact_element()
 
 
 #endif
-

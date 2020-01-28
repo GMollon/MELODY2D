@@ -600,7 +600,7 @@ void Load_static(
     int& Nb_materials,
     vector<Material>& Materials,
     int& Nb_contact_laws,
-    vector<Contact_law> Contact_laws,
+    vector<Contact_law>& Contact_laws,
     vector<vector<int>>& Contacts_Table,
     string& Solver,
     double& Tini,
@@ -672,19 +672,19 @@ void Load_static(
                 vector<double> parameters({0}) ;
                 if (type=="ElasticLinear")
                 {
-                    double p1, p2, p3, p4, p5 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+                    double p1, p2, p3, p4, p5, p6 ;
+                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
                     getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 * p5 / (( 1. + p5 ) * ( 1. - 2. * p5 ))}) ;
+                    vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 * p5 / (( 1. + p5 ) * ( 1. - 2. * p5 )), p6}) ;
                     Material mat ( i, name, type, parameters ) ;
                     Materials.push_back(mat) ;
                 }
                 else if (type=="NeoHookean")
                 {
-                    double p1, p2, p3, p4, p5 ;
-                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 ;
+                    double p1, p2, p3, p4, p5, p6 ;
+                    Static_Control_file >> p1 >> p2 >> p3 >> p4 >> p5 >> p6 ;
                     getline(Static_Control_file, token) ;
-                    vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 / ( 3. * (1. - 2. * p5 ))}) ;
+                    vector<double> parameters({p1, p2, p3, p4 / ( 2. * (1. + p5 )), p4 / ( 3. * (1. - 2. * p5 )), p6}) ;
                     Material mat ( i, name, type, parameters ) ;
                     Materials.push_back(mat) ;
                 }
@@ -1035,6 +1035,7 @@ void Load_static(
                 {
                     body.density=Materials[i].parameters[0] ;
                     body.material_index=i ;
+                    body.heat_capacity=Materials[i].parameters[5] ;
                     break ;
                 }
             }
@@ -1067,6 +1068,7 @@ void Load_static(
                 {
                     body.density=Materials[i].parameters[0] ;
                     body.material_index=i ;
+                    body.heat_capacity=Materials[i].parameters[5] ;
                     break ;
                 }
             }
@@ -1905,7 +1907,8 @@ void Load_dynamic(
     string status ;
     while(getline(Dynamic_file, line))
     {
-        cout << line << endl ;
+        if( flags[7] == 0 )
+            cout << line << endl ;
         if (line.substr(0,13)=="KILL_VELOCITY")
             flags[0] = 1 ;
         if (line.substr(0,14)=="MONITOR_ENERGY")
@@ -1950,7 +1953,8 @@ void Load_dynamic(
             getline(Dynamic_file, token) ;
             Dynamic_file >> index_body ;
             getline(Dynamic_file, token) ;
-            cout << "Deformable " << index_body << endl ;
+            if( flags[7] == 0 )
+                cout << "Deformable " << index_body << endl ;
             Bodies[index_body].status = status ;
             flag_body_rigid = 0 ;
         }
@@ -1961,7 +1965,8 @@ void Load_dynamic(
             getline(Dynamic_file, token) ;
             Dynamic_file >> index_body ;
             getline(Dynamic_file, token) ;
-            cout << "Rigid " << index_body << endl ;
+            if( flags[7] == 0 )
+                cout << "Rigid " << index_body << endl ;
             Bodies[index_body].status = status ;
             flag_body_rigid = 1 ;
         }

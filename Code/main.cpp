@@ -31,7 +31,7 @@ main(int argc, char **argv)
     cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                     Main Program                      %%" << endl ;
-    cout << "%%        Version 3.90 ; 12th of September 2018          %%" << endl ;
+    cout << "%%        Version 3.91 ; 28th of January 2020            %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
     cout << "%%                                                       %%" << endl ;
@@ -74,9 +74,9 @@ main(int argc, char **argv)
     double total_mass, max_mass ;
     int Nb_regions = 0 ;
     vector<vector<int>> Regions ;
-    vector<int> flags(9) ;
+    vector<int> flags(11) ;
     int flag_failure = 0 ;
-    vector<int> To_Plot(40) ;
+    vector<int> To_Plot(41) ;
     vector<vector<int>> Contacts_Table ;
 
     // LOAD STATIC DATA //
@@ -120,6 +120,12 @@ main(int argc, char **argv)
         for (int i=0 ; i<Nb_bodies ; i++)
             Bodies[i].Update_material( Nb_materials, Materials, flags ) ;
     }
+    Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period, flags) ;
+    if (flags[3]==1)
+        Initialize_CZM( Nb_bodies, Bodies, Nb_contact_laws, Contact_laws, flags, Xmin_period, Xmax_period ) ;
+    cout << "Updating Material Properties" << endl ;
+
+
     for (int i=0 ; i<Nb_spies ; i++)
         Spies[i].next_time += Time ;
     vector<vector<vector<double>>> spying(Nb_spies) ;

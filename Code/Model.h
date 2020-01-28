@@ -481,8 +481,8 @@ void Apply_Bonded_Mohr_Coulomb(double kn, double kt, double kbond, double fricbo
         if (gapn<0.)
             Pn = -kn * gapn - damp * vgapn * 2. * sqrt(mass * kn / length) ;
         else
-            Pn = -kbond * gapn - damp * vgapn * 2. * sqrt(mass * kn / length) ;
-        Pt = -kbond * gapt - damp * vgapt * 2. * sqrt(mass * kt / length) ;
+            Pn = -kbond * gapn - damp * vgapn * 2. * sqrt(mass * kbond / length) ;
+        Pt = -kt * gapt - damp * vgapt * 2. * sqrt(mass * kt / length) ;
         if (Pn<-tensbond)
         {
             Damage = 1. ;

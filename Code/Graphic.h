@@ -59,6 +59,7 @@ void Write_graphic(int Nb_bodies,
     ofstream Graphic_file (filename1) ;
     //ofstream Borders_file (filename2) ;
 
+    Graphic_file << setprecision (12) ;
     Graphic_file << "# vtk DataFile Version 2.0" << endl ;
     Graphic_file << "MELODY 2D graphic file ; Iteration " << Number_iteration
                  << " ; Save " << Number_save
@@ -215,6 +216,7 @@ void Write_graphic(int Nb_bodies,
     }
     Graphic_file << endl ;
 
+    Graphic_file << setprecision (6) ;
     Graphic_file << "POLYGONS " << nctot << ' ' << nctot*4 << endl ;
     for (int j(0) ; j<nctot ; j++)
     {
@@ -911,7 +913,20 @@ void Write_graphic(int Nb_bodies,
 
     if ( To_Plot[39] == 1 )
     {
-        Graphic_file << "SCALARS 39-Epsilon_Mass_Scaling float 1" << endl ;
+        Graphic_file << "SCALARS 39_Temperature float 1" << endl ;
+        Graphic_file << "LOOKUP_TABLE default" << endl ;
+        for (int j(0) ; j<ntot ; j++)
+        {
+            bo = indicestot[j][0] ;
+            no = indicestot[j][1] ;
+            Graphic_file << Bodies[bo].temperature << endl ;
+        }
+        Graphic_file << endl ;
+    }
+
+    if ( To_Plot[40] == 1 )
+    {
+        Graphic_file << "SCALARS 40-Epsilon_Mass_Scaling float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -922,9 +937,9 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
-    if ( To_Plot[40] == 1 )
+    if ( To_Plot[41] == 1 )
     {
-        Graphic_file << "SCALARS 40-Unbalanced float 1" << endl ;
+        Graphic_file << "SCALARS 41-Unbalanced float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {

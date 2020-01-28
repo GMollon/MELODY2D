@@ -275,7 +275,7 @@ void Update_proximity(
                                             (Bodies[bodyS].contact_elements[k].border_nodeS == border_nodeS) &&
                                             (Bodies[bodyS].contact_elements[k].bodyM == bodyM) &&
                                             (Bodies[bodyS].contact_elements[k].borderM == borderM) &&
-                                            (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1.))
+                                            (abs(Bodies[bodyS].contact_elements[k].segmentM - segmentM) <= 1))
                                     {
                                         new_contact = Bodies[bodyS].contact_elements[k] ;
                                         flag_exists = 1 ;
@@ -669,11 +669,11 @@ void Update_status(
             }
             else if (Deactivated[i][1] == 2)
             {
-                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y*y,0.5) <= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y*y,0.5) == Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y*y,0.5) >= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
@@ -737,11 +737,11 @@ void Update_status(
             }
             else if (Deactivated[i][1] == 2)
             {
-                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y*y,0.5) <= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y*y,0.5) == Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y*y,0.5) >= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
@@ -805,11 +805,11 @@ void Update_status(
             }
             else if (Deactivated[i][1] == 2)
             {
-                if ((Deactivated[i][4] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][5]))
+                if ((Deactivated[i][4] == 0) & (pow(x*x+y*y,0.5) <= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 1) & (pow(x*x+y*y,0.5) == Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
-                else if ((Deactivated[i][4] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][5]))
+                else if ((Deactivated[i][4] == 2) & (pow(x*x+y*y,0.5) >= Deactivated[i][5]))
                     Bodies[Deactivated[i][2]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
@@ -968,11 +968,11 @@ void Update_status(
             }
             else if (Deactivated[i][1] == 2)
             {
-                if ((Deactivated[i][5] == 0) & (pow(x*x+y+y,0.5) <= Deactivated[i][6]))
+                if ((Deactivated[i][5] == 0) & (pow(x*x+y*y,0.5) <= Deactivated[i][6]))
                     Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if ((Deactivated[i][5] == 1) & (pow(x*x+y+y,0.5) == Deactivated[i][6]))
+                else if ((Deactivated[i][5] == 1) & (pow(x*x+y*y,0.5) == Deactivated[i][6]))
                     Bodies[Deactivated[i][3]].status = "inactive" ;
-                else if ((Deactivated[i][5] == 2) & (pow(x*x+y+y,0.5) >= Deactivated[i][6]))
+                else if ((Deactivated[i][5] == 2) & (pow(x*x+y*y,0.5) >= Deactivated[i][6]))
                     Bodies[Deactivated[i][3]].status = "inactive" ;
             }
             else if (Deactivated[i][1] == 3)
