@@ -31,7 +31,7 @@ main(int argc, char **argv)
     cout << "%%              for DYnamic simulation in 2D             %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                     Main Program                      %%" << endl ;
-    cout << "%%       Version 3.90dev ; 13th of November 2019         %%" << endl ;
+    cout << "%%        Version 3.91 ; 28th of January 2020            %%" << endl ;
     cout << "%%                                                       %%" << endl ;
     cout << "%%                Author: Guilhem Mollon                 %%" << endl ;
     cout << "%%                                                       %%" << endl ;
@@ -51,7 +51,8 @@ main(int argc, char **argv)
     vector<Contact_law> Contact_laws ;
     string Solver ;
     double Tini, Deltat, Tend, Time ;
-    double Target_error, Control_parameter, Accepted_ratio ;
+    double Target_error, Inv_Target_error, Control_parameter, Accepted_ratio ;
+    double Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling ;
     double Save_period, Print_period, Contact_update_period ;
     double Next_save, Next_print, Next_contact_update ;
     int Number_save(0), Number_print, Number_iteration ;
@@ -70,18 +71,20 @@ main(int argc, char **argv)
     vector<vector<double>> monitoring ;
     int neval ;
     double max_error, mean_error ;
+    double total_mass, max_mass ;
     int Nb_regions = 0 ;
     vector<vector<int>> Regions ;
     vector<int> flags(11) ;
     int flag_failure = 0 ;
-    vector<int> To_Plot(40) ;
+    vector<int> To_Plot(41) ;
     vector<vector<int>> Contacts_Table ;
 
     // LOAD STATIC DATA //
     Load_static( Simulation_name, Nb_materials, Materials,
                  Nb_contact_laws, Contact_laws, Contacts_Table,
                  Solver, Tini,	Deltat, Tend,
-                 Target_error, Control_parameter, Accepted_ratio,
+                 Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                 Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
                  Save_period, Print_period, Contact_update_period,
                  Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,
                  Activate_plot,	Xmin_plot,	Xmax_plot,	Ymin_plot,	Ymax_plot,
@@ -102,8 +105,15 @@ main(int argc, char **argv)
         cout << "Initializing" << endl ;
     for (int i=0 ; i<Nb_bodies ; i++)
         Bodies[i].Update_borders(Xmin_period, Xmax_period) ;
+
     for (int i=0 ; i<Nb_bodies ; i++)
         Bodies[i].Update_bc(Time) ;
+
+    Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period, flags) ;
+    if (flags[3]==1)
+        Initialize_CZM( Nb_bodies, Bodies, Nb_contact_laws, Contact_laws, flags, Xmin_period, Xmax_period ) ;
+    cout << "Updating Material Properties" << endl ;
+
     #pragma omp parallel
     {
         #pragma omp for schedule(dynamic)
@@ -114,6 +124,8 @@ main(int argc, char **argv)
     if (flags[3]==1)
         Initialize_CZM( Nb_bodies, Bodies, Nb_contact_laws, Contact_laws, flags, Xmin_period, Xmax_period ) ;
     cout << "Updating Material Properties" << endl ;
+
+
     for (int i=0 ; i<Nb_spies ; i++)
         Spies[i].next_time += Time ;
     vector<vector<vector<double>>> spying(Nb_spies) ;
@@ -125,44 +137,68 @@ main(int argc, char **argv)
     // MAIN PROGRAM //
     if (flags[7]==0)
         cout << "Running main program" << endl ;
+
     while ( Time < Tend )
     {
-        Number_iteration++ ;            // SEQUENTIAL //
+        Number_iteration++ ;                                                         // SEQUENTIAL //
+
+        //********************************************//
+        //** SOLVER **********************************//
+        //********************************************//
         if ( Solver == "Euler" )
         {
-            Euler_step(Nb_bodies, Bodies, Nb_regions, Regions,
+            Euler_step(Nb_bodies, Bodies, Nb_regions,Regions,
                        Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
                        Tend, Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,
                        Time, Deltat, Number_iteration, flags) ;
         }
-        else if ( Solver == "Adaptive_Euler" )
+        else if ( Solver == "Adaptive_Euler" || Solver == "Mass_Scaling" || Solver == "Adaptive_Mass_Scaling" || Solver == "Euler_2")
         {
-            Adaptive_Euler_step(Nb_bodies, Bodies, Nb_regions, Regions,
-                                Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
-                                Tend, Xmin_period, Xmax_period, Penalty,
-                                Xgravity, Ygravity,
-                                Time, Deltat, Number_iteration,
-                                Next_contact_update, Contact_update_period,
-                                Target_error, Control_parameter, Accepted_ratio,
-                                neval, max_error, mean_error, flags) ;
-            //cout << "44" << endl ;
+            Solver_step(Nb_bodies, Bodies, Nb_regions, Regions,
+                        Nb_materials, Materials, Nb_contact_laws, Contact_laws, Contacts_Table,
+                        Tend, Xmin_period, Xmax_period, Penalty,
+                        Xgravity, Ygravity,
+                        Time, Deltat, Number_iteration,
+                        Next_contact_update, Contact_update_period,
+                        Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                        Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
+                        neval, max_error, mean_error, flags, total_mass, max_mass, Solver) ;
+           //cout << "   SOLVER : " << Solver << " " << endl ;
         }
+
+
+        //********************************************//
+        //** MONITORING ******************************//
+        //********************************************//
         if (flags[8]==0)
             Monitoring(Nb_bodies, Bodies,
                        Time, Deltat, Number_iteration,
                        neval, max_error, mean_error, flags,
-                       monitoring, Nb_monitored, Monitored) ;              // SEQUENTIAL //
+                       monitoring, Nb_monitored, Monitored) ;                           // SEQUENTIAL //
+
+        //********************************************//
+        //** SPYING **********************************//
+        //********************************************//
         Spying(Nb_bodies, Bodies,
                Time, Deltat, Number_iteration,
-               spying, Nb_spies, Spies, Xmin_period, Xmax_period) ;                                                    // SEQUENTIAL //
+               spying, Nb_spies, Spies, Xmin_period, Xmax_period,
+               Nb_materials, Materials) ;                                               // SEQUENTIAL //
         //cout << "45" << endl ;
+
+        //********************************************//
+        //** CONTACT UPDATE **************************//
+        //********************************************//
         if ( Time > Next_contact_update-1.e-6*Deltat )                                  // SEQUENTIAL //
         {
             Next_contact_update = Next_contact_update + Contact_update_period ;
             Update_proximity(Nb_bodies, Bodies, Xmin_period, Xmax_period, flags) ;
-            Update_status(Nb_bodies, Bodies, Nb_deactivated, Deactivated) ;           // SEQUENTIAL //
+            Update_status(Nb_bodies, Bodies, Nb_deactivated, Deactivated) ;             // SEQUENTIAL //
         }
         //cout << "46" << endl ;
+
+        //********************************************//
+        //** WRITE GRAPHIC ***************************//
+        //********************************************//
         if ( Time > Next_print-1.e-6*Deltat )                                           // SEQUENTIAL //
         {
             Number_print = Number_print + 1 ;                                           // SEQUENTIAL //
@@ -170,6 +206,10 @@ main(int argc, char **argv)
             Write_graphic(Nb_bodies, Bodies, Number_iteration, Number_save, Number_print, Time, Xmin_period, Xmax_period, Nb_materials, Materials, To_Plot) ;
         }
         //cout << "47" << endl ;
+
+        //********************************************//
+        //** SAVE ************************************//
+        //********************************************//
         if ( Time > Next_save-1.e-6*Deltat )                                            // SEQUENTIAL //
         {
             Number_save = Number_save + 1 ;                                             // SEQUENTIAL //
@@ -177,13 +217,14 @@ main(int argc, char **argv)
             Write_dynamic( Simulation_name,  Number_save, Number_print,
                            Time, Number_iteration, Deltat, Solver,
                            Next_save,	Next_print, Next_contact_update,
-                           Nb_bodies, Bodies, flags ) ;                                            // SEQUENTIAL //
+                           Nb_bodies, Bodies, flags ) ;                                 // SEQUENTIAL //
             if (flags[8]==0)
-                Write_monitoring( monitoring, flags ) ;                    // SEQUENTIAL //
+                Write_monitoring( monitoring, flags ) ;                                 // SEQUENTIAL //
             Write_spying( spying, Nb_spies, Spies, flags ) ;                            // SEQUENTIAL //
         }
         //cout << "48" << endl ;
-        for (int i=0 ; i<Nb_bodies ; i++)
+
+        for (int i=0 ; i<Nb_bodies ; i++) // Check failure
         {
             if (std::isnan(Bodies[i].total_error))
             {

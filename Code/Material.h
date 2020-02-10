@@ -50,6 +50,4 @@ Material::~Material()
 
 // Methods
 
-
-
 #endif

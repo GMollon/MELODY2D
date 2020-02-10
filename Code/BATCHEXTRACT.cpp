@@ -32,7 +32,8 @@ main(int argc, char **argv)
     vector<Contact_law> Contact_laws ;
     string Solver ;
     double Tini, Deltat, Tend, Time ;
-    double Target_error, Control_parameter, Accepted_ratio ;
+    double Target_error, Inv_Target_error, Control_parameter, Accepted_ratio ;
+    double Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling ;
     double Save_period, Print_period, Contact_update_period ;
     double Next_save, Next_print, Next_contact_update ;
     int Number_save(0), Number_print, Number_iteration ;
@@ -51,15 +52,16 @@ main(int argc, char **argv)
     int Nb_regions = 0 ;
     vector<vector<int>> Regions ;
     vector<int> flags(11) ;
-    int flag_failure = 0 ;
-    vector<int> To_Plot(40) ;
+    //int flag_failure = 0 ;
+    vector<int> To_Plot(41) ;
     vector<vector<int>> Contacts_Table ;
 
     // LOAD STATIC DATA //
     Load_static( Simulation_name, Nb_materials, Materials,
                  Nb_contact_laws, Contact_laws, Contacts_Table,
                  Solver, Tini,	Deltat, Tend,
-                 Target_error, Control_parameter, Accepted_ratio,
+                 Target_error, Inv_Target_error, Control_parameter, Accepted_ratio,
+                 Max_mass_scaling, Control_parameter_mass_scaling, Error_factor_mass_scaling, Decrease_factor_mass_scaling,
                  Save_period, Print_period, Contact_update_period,
                  Xmin_period, Xmax_period, Penalty, Xgravity, Ygravity,
                  Activate_plot,	Xmin_plot,	Xmax_plot,	Ymin_plot,	Ymax_plot,
@@ -81,7 +83,7 @@ main(int argc, char **argv)
                       Bodies, flags ) ;
         Update_contact_pressures(Nb_bodies, Bodies) ;
         Number_print = i ;
-        Spying(Nb_bodies, Bodies, Time, Deltat, Number_iteration, spying, Nb_spies, Spies, Xmin_period, Xmax_period) ;
+        Spying(Nb_bodies, Bodies, Time, Deltat, Number_iteration, spying, Nb_spies, Spies, Xmin_period, Xmax_period, Nb_materials, Materials) ;
         Write_spying( spying, Nb_spies, Spies, flags ) ;
         //Write_graphic(Nb_bodies , Bodies , Number_iteration , Number_save , Number_print , Time , Xmin_period , Xmax_period , Nb_materials , Materials) ;
     }

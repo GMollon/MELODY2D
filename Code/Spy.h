@@ -50,5 +50,4 @@ Spy::~Spy()
 
 // Methods
 
-
 #endif

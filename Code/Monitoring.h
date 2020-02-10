@@ -29,6 +29,7 @@ void Monitoring(int Nb_bodies,
     double y ;
     double r ;
     double m ;
+
     for (int i(0) ; i < Nb_monitored ; i++)
     {
         if (Monitored[i][0] == 0)
@@ -105,7 +106,7 @@ void Monitoring(int Nb_bodies,
             else if (Monitored[i][1] == 1)
                 current_monitoring.push_back(y) ;
             else if (Monitored[i][1] == 2)
-                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
             else if (Monitored[i][1] == 3)
                 current_monitoring.push_back(r) ;
         }
@@ -145,7 +146,7 @@ void Monitoring(int Nb_bodies,
             else if (Monitored[i][1] == 1)
                 current_monitoring.push_back(y) ;
             else if (Monitored[i][1] == 2)
-                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
             else if (Monitored[i][1] == 3)
                 current_monitoring.push_back(r) ;
         }
@@ -185,7 +186,7 @@ void Monitoring(int Nb_bodies,
             else if (Monitored[i][1] == 1)
                 current_monitoring.push_back(y) ;
             else if (Monitored[i][1] == 2)
-                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
             else if (Monitored[i][1] == 3)
                 current_monitoring.push_back(r) ;
         }
@@ -330,7 +331,7 @@ void Monitoring(int Nb_bodies,
             else if (Monitored[i][1] == 1)
                 current_monitoring.push_back(y) ;
             else if (Monitored[i][1] == 2)
-                current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
             else if (Monitored[i][1] == 3)
                 current_monitoring.push_back(r) ;
         }
@@ -572,8 +573,43 @@ void Spying(int Nb_bodies,
             int& Nb_spies,
             vector<Spy>& Spies,
             double Xmin_period,
-            double Xmax_period)
+            double Xmax_period,
+            int Nb_materials,
+            vector<Material> Materials)
 {
+    bool flag = false ;
+
+    //Recalculate stress on nodes if there is a spy on them
+    for (int n(0) ; n < Nb_spies ; n++)
+    {
+        if ( Time < Spies[n].next_time-1.e-6*Deltat )
+            continue ;
+
+        int nb_quantities = Spies[n].nb_quantities ;
+        vector<vector<double>> Monitored = Spies[n].quantities ;
+        for (int i(0) ; i < nb_quantities ; i++)
+        {
+            if (Monitored[i][0] == 6)
+            {
+                #pragma omp parallel
+                {
+                    #pragma omp parallel
+                    for(int i = 0 ; i < Nb_bodies ; i++) //Recalculate stress on each node
+                        Bodies[i].Compute_nodal_stresses( Nb_materials, Materials ) ;
+                }
+
+                flag = true ; //If we recalculate stress, we do not need to do it again for other spies at this time step
+                break ;
+
+            }
+            if (flag == true)
+                break;
+        }
+        if (flag == true)
+            break;
+    }
+
+    //Main loop
     for (int n(0) ; n < Nb_spies ; n++)
     {
         if ( Time < Spies[n].next_time-1.e-6*Deltat )
@@ -585,7 +621,14 @@ void Spying(int Nb_bodies,
         double x ;
         double y ;
         double r ;
+        double s ;
         double m ;
+        double dx ;
+        double dy ;
+        double mass_x ;
+        double mass_y ;
+        double mass_tot ;
+
         for (int i(0) ; i < nb_quantities ; i++)
         {
             if (Monitored[i][0] == 0)
@@ -743,7 +786,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 1)
                     current_monitoring.push_back(y) ;
                 else if (Monitored[i][1] == 2)
-                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                    current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
                 else if (Monitored[i][1] == 3)
                     current_monitoring.push_back(r) ;
             }
@@ -783,7 +826,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 1)
                     current_monitoring.push_back(y) ;
                 else if (Monitored[i][1] == 2)
-                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                    current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
                 else if (Monitored[i][1] == 3)
                     current_monitoring.push_back(r) ;
             }
@@ -823,7 +866,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 1)
                     current_monitoring.push_back(y) ;
                 else if (Monitored[i][1] == 2)
-                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                    current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
                 else if (Monitored[i][1] == 3)
                     current_monitoring.push_back(r) ;
             }
@@ -968,15 +1011,18 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 1)
                     current_monitoring.push_back(y) ;
                 else if (Monitored[i][1] == 2)
-                    current_monitoring.push_back(pow(x*x+y+y,0.5)) ;
+                    current_monitoring.push_back(pow(x*x+y*y,0.5)) ;
                 else if (Monitored[i][1] == 3)
                     current_monitoring.push_back(r) ;
             }
             else if (Monitored[i][0] == 5)
                 current_monitoring.push_back(Bodies[Monitored[i][1]].nodes[Monitored[i][2]].jacobian) ;
+
             else if (Monitored[i][0] == 6)
             {
                 //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << Monitored[i][3] << endl ;
+                //Bodies[i].Compute_nodal_stresses( Nb_materials, Materials ) ;
+
                 double s, m ;
                 if  (Monitored[i][3] >= 0)
                 {
@@ -1039,7 +1085,7 @@ void Spying(int Nb_bodies,
                 if (Monitored[i][1] == 0)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1063,7 +1109,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 1)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1087,7 +1133,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 2)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1111,7 +1157,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 3)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1135,7 +1181,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 4)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1159,7 +1205,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 5)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1183,7 +1229,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 6)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1207,7 +1253,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 7)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1231,7 +1277,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 8)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1255,7 +1301,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 9)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1283,7 +1329,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 12)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1307,7 +1353,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 13)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1331,7 +1377,7 @@ void Spying(int Nb_bodies,
                 else if (Monitored[i][1] == 14)
                 {
                     double q = 0. ;
-                    if (Monitored[i][3]>=0 & Monitored[i][4]>=0)
+                    if ((Monitored[i][3]>=0) & (Monitored[i][4]>=0))
                     {
                         for (int j(0) ; j<Bodies[Monitored[i][2]].nb_contact_elements ; j++)
                         {
@@ -1496,6 +1542,135 @@ void Spying(int Nb_bodies,
                     current_monitoring.push_back(x) ;
                 }
             }
+            else if (Monitored[i][0] == 11) //Spy ERROR
+            {
+                //cout << Monitored[i][0] << Monitored[i][1] << Monitored[i][2] << Monitored[i][3] << endl ;
+                if (Monitored[i][3] >=0 )
+                {
+                    x = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].x_error ; //Error along x for node i
+                    y = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].y_error ;
+                    s = pow(x*x + y*y, 0.5) ; //Norm error along x and y for node i
+                    r = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].error_norm ; //Error normalized
+                    m = r ; //useless, there is no "max" on a single node, this line if for avoiding a bug
+                }
+                else if (Monitored[i][3] == -1 )
+                {
+                    x = 0. ;
+                    y = 0. ;
+                    s = 0. ;
+                    r = 0. ;
+                    m = 0. ;
+                    for (int n = 0 ; n<Bodies[Monitored[i][2]].nb_nodes ; n++)
+                    {
+                        if (Monitored[i][1] == 0 )
+                            x += Bodies[Monitored[i][2]].nodes[n].x_error ;
+                        else if (Monitored[i][1] == 1 )
+                            y += Bodies[Monitored[i][2]].nodes[n].y_error ;
+                        else if (Monitored[i][1] == 2 )
+                            s += pow(Bodies[Monitored[i][2]].nodes[n].x_error*Bodies[Monitored[i][2]].nodes[n].x_error +
+                                     Bodies[Monitored[i][2]].nodes[n].y_error*Bodies[Monitored[i][2]].nodes[n].y_error, 0.5) ;
+                        else if (Monitored[i][1] == 3 )
+                            r += Bodies[Monitored[i][2]].nodes[n].error_norm ;
+                        else if (Monitored[i][1] == 4 )
+                        {
+                            if (Bodies[Monitored[i][2]].nodes[n].error_norm > m)
+                                m = Bodies[Monitored[i][2]].nodes[n].error_norm ;
+                        }
+                    }
+                    x /= Bodies[Monitored[i][2]].nb_nodes ; //These quantities are averaged on all nodes, except m for max
+                    y /= Bodies[Monitored[i][2]].nb_nodes ;
+                    s /= Bodies[Monitored[i][2]].nb_nodes ;
+                    r /= Bodies[Monitored[i][2]].nb_nodes ;
+                }
+
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(s) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(r) ;
+                else if (Monitored[i][1] == 4)
+                    current_monitoring.push_back(m) ;
+            }
+            else if (Monitored[i][0] == 12) // Spy MASS SCALING
+            {
+                if (Monitored[i][3] >=0 ) //On a node
+                {
+                    x = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].x_factor_mass_scaling ;
+                    y = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].y_factor_mass_scaling ;
+                    r = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].factor_mass_scaling ;
+
+                    dx = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].delta_x_factor_mass_scaling ;
+                    dy = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].delta_y_factor_mass_scaling ;
+
+                    mass_x = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].x_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[Monitored[i][3]].x_mass ;
+                    mass_y = Bodies[Monitored[i][2]].nodes[Monitored[i][3]].y_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[Monitored[i][3]].y_mass ;
+                    mass_tot = sqrt(mass_x * mass_x + mass_y * mass_y) ;
+                }
+                else if (Monitored[i][3] == -1 ) //On every node of one body
+                {
+                    x = 0. ;
+                    y = 0. ;
+                    r = 0. ;
+                    dx = 0. ;
+                    dy = 0. ;
+                    mass_x = 0. ;
+                    mass_y = 0. ;
+                    mass_tot = 0. ;
+
+                    for (int n=0 ; n<Bodies[Monitored[i][2]].nb_nodes ; n++) //Main loop
+                    {
+                        if (Monitored[i][1] == 0 )
+                            x += Bodies[Monitored[i][2]].nodes[n].x_factor_mass_scaling ;
+                        else if (Monitored[i][1] == 1 )
+                            y += Bodies[Monitored[i][2]].nodes[n].y_factor_mass_scaling ;
+                        else if (Monitored[i][1] == 2 )
+                            r += Bodies[Monitored[i][2]].nodes[n].factor_mass_scaling ;
+
+                        else if (Monitored[i][1] == 3 )
+                            dx += Bodies[Monitored[i][2]].nodes[n].delta_x_factor_mass_scaling ;
+                        else if (Monitored[i][1] == 4)
+                            dy += Bodies[Monitored[i][2]].nodes[n].delta_y_factor_mass_scaling ;
+                        else if (Monitored[i][1] == 5)
+                        {
+                            dx += Bodies[Monitored[i][2]].nodes[n].delta_x_factor_mass_scaling ;
+                            dy += Bodies[Monitored[i][2]].nodes[n].delta_y_factor_mass_scaling ;
+                        }
+
+                        else if (Monitored[i][1] == 6)
+                            mass_x += Bodies[Monitored[i][2]].nodes[n].x_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[n].x_mass ;
+                        else if (Monitored[i][1] == 7)
+                            mass_y += Bodies[Monitored[i][2]].nodes[n].y_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[n].y_mass ;
+                        else if (Monitored[i][1] == 8)
+                        {
+                            mass_x = Bodies[Monitored[i][2]].nodes[n].x_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[n].x_mass ;
+                            mass_y = Bodies[Monitored[i][2]].nodes[n].y_factor_mass_scaling * Bodies[Monitored[i][2]].nodes[n].y_mass ;
+                            mass_tot += sqrt(mass_x * mass_x + mass_y * mass_y) ;
+                        }
+                    }
+                }
+
+                if (Monitored[i][1] == 0)
+                    current_monitoring.push_back(x) ;
+                else if (Monitored[i][1] == 1)
+                    current_monitoring.push_back(y) ;
+                else if (Monitored[i][1] == 2)
+                    current_monitoring.push_back(r) ;
+                else if (Monitored[i][1] == 3)
+                    current_monitoring.push_back(dx) ;
+                else if (Monitored[i][1] == 4)
+                    current_monitoring.push_back(dy) ;
+                else if (Monitored[i][1] == 5)
+                    current_monitoring.push_back((dx + dy) * 0.5) ;
+                else if (Monitored[i][1] == 6)
+                    current_monitoring.push_back(mass_x) ;
+                else if (Monitored[i][1] == 7)
+                    current_monitoring.push_back(mass_y) ;
+                else if (Monitored[i][1] == 8)
+                    current_monitoring.push_back(mass_tot) ;
+            }
             else if (Monitored[i][0] == 11)
             {
                 int n = Monitored[i][2] ;
@@ -1503,7 +1678,7 @@ void Spying(int Nb_bodies,
                 vector<double> Bins(n) ;
                 int inbin, nc ;
                 double period = Xmax_period - Xmin_period ;
-                double angle, fx, fy, xs, ys ;
+                double angle, fx, fy, xs; //ys ;
                 nc = 0 ;
                 for (int k=0 ; k<n ; k++)
                     Bins[k] = 0. ;
@@ -1512,7 +1687,7 @@ void Spying(int Nb_bodies,
                     if (Bodies[k].status == "inactive")
                         continue ;
                     xs = Bodies[k].x_current - period * floor( ( Bodies[k].x_current - Xmin_period ) / period ) ; ;
-                    ys = Bodies[k].y_current ;
+                    //ys = Bodies[k].y_current ;
                     if ((xs<Monitored[i][3]) || (xs>Monitored[i][4]) || (xs<Monitored[i][5]) || (xs>Monitored[i][6]))
                         continue ;
                     for (int j=0 ; j<Bodies[k].nb_contact_elements ; j++)
@@ -1538,7 +1713,5 @@ void Spying(int Nb_bodies,
         spying[n].push_back(current_monitoring) ;
     }
 }
-
-
 
 #endif

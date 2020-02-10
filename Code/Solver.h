@@ -91,9 +91,11 @@ void Euler_step(
 
 //********************************************//
 //** ADAPTIVE EULER STEP *********************//
+//** MASS SCALING ****************************//
+//** ADAPTIVE MASS SCALING *******************//
 //********************************************//
 
-void Adaptive_Euler_step(
+void Solver_step(
     int Nb_bodies,
     vector<Body>& Bodies,
     int Nb_regions,
@@ -101,7 +103,7 @@ void Adaptive_Euler_step(
     int Nb_materials,
     vector<Material> Materials,
     int Nb_contact_laws,
-    vector<Contact_law> Contact_laws,
+    vector<Contact_law>& Contact_laws,
     vector<vector<int>>& Contacts_Table,
     double Tend,
     double Xmin_period,
@@ -115,12 +117,25 @@ void Adaptive_Euler_step(
     double& Next_contact_update,
     double& Contact_update_period,
     double Target_error,
+    double Inv_Target_error,
     double Control_parameter,
     double Accepted_ratio,
+
+    double Max_mass_scaling,
+    double Control_parameter_mass_scaling,
+    double Error_factor_mass_scaling,
+    double Decrease_factor_mass_scaling,
+
     int& neval,
     double& max_error,
     double& mean_error,
-    vector<int>& flags)
+    vector<int>& flags,
+
+    double& total_mass,
+    double& max_mass,
+
+    string Solver
+)
 {
     if (flags[7]==0)                                                                                    // SEQUENTIAL //
     {
@@ -133,7 +148,7 @@ void Adaptive_Euler_step(
         for (int i=0 ; i<Nb_bodies ; i++)
             Bodies[i].Store() ;
     }
-    int bodyformax, nodeformax ;                                                                        // SEQUENTIAL //
+    int bodyformax(0), nodeformax(0) ;                                                                        // SEQUENTIAL //
     int flag_success = 0 ;                                                                              // SEQUENTIAL //
     neval = 0 ;                                                                                         // SEQUENTIAL //
     while (flag_success == 0)
@@ -141,6 +156,11 @@ void Adaptive_Euler_step(
         neval++ ;                                                                                       // SEQUENTIAL //
         #pragma omp parallel
         {
+            //********************************************//
+            //** FIRST HALF-TIME STEP ********************//
+            //********************************************//
+
+            // 1 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -151,6 +171,8 @@ void Adaptive_Euler_step(
                 Bodies[i].Update_borders(Xmin_period, Xmax_period) ;
                 Bodies[i].Update_contacts(Bodies, Xmin_period, Xmax_period) ;
             }
+
+            // 2 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -176,6 +198,8 @@ void Adaptive_Euler_step(
                     continue ;
                 Bodies[Regions[i][0]].Update_internal_forces(Regions[i][1], Nb_materials, Materials) ;
             }
+
+            // 4 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -189,6 +213,12 @@ void Adaptive_Euler_step(
                 Bodies[i].Update_kinematics() ;
                 Bodies[i].Update_current_positions() ;
             }
+
+            //********************************************//
+            //** SECOND HALF-TIME STEP *******************//
+            //********************************************//
+
+            // 1 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -199,6 +229,8 @@ void Adaptive_Euler_step(
                 Bodies[i].Update_borders(Xmin_period, Xmax_period) ;
                 Bodies[i].Update_contacts(Bodies, Xmin_period, Xmax_period) ;
             }
+
+            // 2 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -224,6 +256,8 @@ void Adaptive_Euler_step(
                     continue ;
                 Bodies[Regions[i][0]].Update_internal_forces(Regions[i][1], Nb_materials, Materials) ;
             }
+
+            // 4 //
             #pragma omp for schedule(dynamic)
             for (int i=0 ; i<Nb_bodies ; i++)
             {
@@ -236,15 +270,26 @@ void Adaptive_Euler_step(
                 Bodies[i].Update_kinematics() ;
                 Bodies[i].Update_current_positions() ;
                 Bodies[i].Compute_error() ;
+                //cout << "40 " << i << endl ;
+
+                if (Solver == "Mass_Scaling" || Solver == "Adaptive_Mass_Scaling")
+                    Bodies[i].Compute_mass_scaling(Target_error, Inv_Target_error, Control_parameter_mass_scaling, Max_mass_scaling,
+                                                   Error_factor_mass_scaling, Accepted_ratio, Decrease_factor_mass_scaling) ;
             }
         }
+
+        //********************************************//
+        //** ERROR CALCULATION ***********************//
+        //********************************************//
+
         mean_error = 0. ;                                                                               // SEQUENTIAL //
         max_error = 0. ;                                                                                // SEQUENTIAL //
         int nnodes = 0 ;                                                                                // SEQUENTIAL //
+
         for (int i=0 ; i<Nb_bodies ; i++)                                                               // SEQUENTIAL //
         {
             if (Bodies[i].status == "inactive")
-                continue ;                                              // SEQUENTIAL //
+                continue ;                                                                              // SEQUENTIAL //
             mean_error += Bodies[i].total_error ;                                                       // SEQUENTIAL //
             nnodes += Bodies[i].nb_nodes ;                                                              // SEQUENTIAL //
             if (Bodies[i].max_error > max_error)                                                        // SEQUENTIAL //
@@ -258,40 +303,184 @@ void Adaptive_Euler_step(
 
         if (flags[7]==0)
             cout << " ; dt " << Deltat << " ; err " << max_error << " -" << bodyformax << "-" << nodeformax << "- (" << mean_error << ")" << endl ;
-        double error = max_error ;                                                                      // SEQUENTIAL //
-        if (error > Target_error * Accepted_ratio)                                                      // SEQUENTIAL //
+
+        //********************************************//
+        //** MASS CALCULATION ************************//
+        //********************************************//
+
+        if (Solver == "Mass_Scaling" || Solver == "Adaptive_Mass_Scaling")
         {
-            flag_success = 0 ;                                                                          // SEQUENTIAL //
-            #pragma omp parallel
+            total_mass = 0. ;
+            max_mass = 0. ;
+
+            for (int i=0 ; i<Nb_bodies ; i++)                                                               // SEQUENTIAL //
             {
-                #pragma omp for schedule(dynamic)
-                for (int i=0 ; i<Nb_bodies ; i++)
-                    Bodies[i].Restore() ;
+                if (Bodies[i].status == "inactive")
+                    continue ;
+                total_mass += Bodies[i].mass_mass_scaling ;
+
+                if (Bodies[i].mass_mass_scaling * Bodies[i].inverse_mass > max_mass)
+                {
+                    max_mass = Bodies[i].mass_mass_scaling * Bodies[i].inverse_mass ;
+                    bodyformax = i ;
+                }
             }
-            double correction1 = error / Target_error ;                                                 // SEQUENTIAL //
-            double correction2 = 1. / Accepted_ratio ;                                                  // SEQUENTIAL //
-            if (correction1>correction2)
-                Deltat = Deltat / pow(correction1, Control_parameter) ;     // SEQUENTIAL //
-            else
-                Deltat = Deltat / pow(correction2, Control_parameter) ;     // SEQUENTIAL //
-            if (Deltat>Contact_update_period)
-                Deltat = Contact_update_period ;                        // SEQUENTIAL //
-            if (flags[7]==0)
-                cout << "                 Failed" ;                                        // SEQUENTIAL //
+
+            cout <<"      MS " << setprecision(15) <<max_mass << " -" << bodyformax << endl;
+
         }
-        else                                                                                            // SEQUENTIAL //
+
+        //********************************************//
+        //** DELTA T CALCULATION ************ ERROR **//
+        //********************************************//
+
+        double error = max_error ;
+
+        if (Solver == "Adaptive_Euler")
+        {
+            //cout << "Adaptive_Euler ENTREE" ;
+            if (error > Target_error * Accepted_ratio)                                                // SEQUENTIAL //
+            {
+                flag_success = 0 ;                                                                    // SEQUENTIAL //
+                #pragma omp parallel
+                {
+                    #pragma omp for schedule(dynamic)
+                    for (int i=0 ; i<Nb_bodies ; i++)
+                        Bodies[i].Restore() ;
+                }
+                double correction1 = error / Target_error ;                                            // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                             // SEQUENTIAL //
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;                            // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ;                            // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                                                   // SEQUENTIAL //
+                if (flags[7]==0)
+                    cout << "                 Failed" ;                                                // SEQUENTIAL //
+            }
+
+            else
+            {
+                flag_success = 1 ;                                                                          // SEQUENTIAL //
+                Time += Deltat ;                                                                            // SEQUENTIAL //
+                double correction1 = error / Target_error ;                                                 // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                                  // SEQUENTIAL //
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;     // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ;     // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                        // SEQUENTIAL //
+                Update_contact_pressures( Nb_bodies, Bodies ) ;                                             // SEQUENTIAL //
+            }
+            //cout << "Adaptive_Euler SORTIE" ;
+
+        }
+
+        if(Solver == "Euler_2")
         {
             flag_success = 1 ;                                                                          // SEQUENTIAL //
             Time += Deltat ;                                                                            // SEQUENTIAL //
             double correction1 = error / Target_error ;                                                 // SEQUENTIAL //
             double correction2 = 1. / Accepted_ratio ;                                                  // SEQUENTIAL //
             if (correction1>correction2)
-                Deltat = Deltat / pow(correction1, Control_parameter) ;     // SEQUENTIAL //
+                Deltat = Deltat / pow(correction1, Control_parameter) ;                                 // SEQUENTIAL //
             else
-                Deltat = Deltat / pow(correction2, Control_parameter) ;     // SEQUENTIAL //
+                Deltat = Deltat / pow(correction2, Control_parameter) ;                                 // SEQUENTIAL //
             if (Deltat>Contact_update_period)
-                Deltat = Contact_update_period ;                        // SEQUENTIAL //
+                Deltat = Contact_update_period ;                                                        // SEQUENTIAL //
             Update_contact_pressures( Nb_bodies, Bodies ) ;                                             // SEQUENTIAL //
+        }
+
+        if (Solver == "Mass_Scaling")
+        {
+            if (max_error > Target_error * Accepted_ratio)                                              // SEQUENTIAL //
+            {
+                flag_success = 0 ;                                                                      // SEQUENTIAL //
+                #pragma omp parallel
+                {
+                    #pragma omp for schedule(dynamic)
+                    for (int i=0 ; i<Nb_bodies ; i++)
+                        Bodies[i].Restore() ;
+                }
+                double correction1 = max_error * Inv_Target_error ;                                     // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                              // SEQUENTIAL //
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;                             // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ;                             // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                                                    // SEQUENTIAL //
+                if (flags[7]==0)
+                    cout << "                 Failed" ;                                                 // SEQUENTIAL //
+            }
+            else                                                                                        // SEQUENTIAL //
+            {
+                //cout << "41" << endl ;
+                flag_success = 1 ;                                                                      // SEQUENTIAL //
+                Time += Deltat ;                                                                        // SEQUENTIAL //
+                double correction1 = max_error * Inv_Target_error ;                                     // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                              // SEQUENTIAL //
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;                             // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ;                             // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                                                    // SEQUENTIAL //
+                //cout << "42" << endl ;
+                Update_contact_pressures( Nb_bodies, Bodies ) ;                                         // SEQUENTIAL //
+                //cout << "43" << endl ;
+            }
+        }
+
+        //********************************************//
+        //** DELTA T CALCULATION ***** MASS-SCALING **//
+        //********************************************//
+        if (Solver == "Adaptive_Mass_Scaling")
+        {
+            if (max_mass > Accepted_ratio + 0.05)                                                       // SEQUENTIAL //
+            {
+                flag_success = 0 ;                                                                      // SEQUENTIAL //
+                #pragma omp parallel
+                {
+                    #pragma omp for schedule(dynamic)
+                    for (int i=0 ; i<Nb_bodies ; i++)
+                        Bodies[i].Restore() ;
+                }
+                double correction1 = max_mass ;//* Inv_Target_error ;                                   // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                              // SEQUENTIAL //
+                cout << "                    ECHEC " << correction1 << " " << correction2 << endl;
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;                             // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ;                             // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                                                    // SEQUENTIAL //
+                if (flags[7]==0)
+                    cout << "                 Failed" ;                                                 // SEQUENTIAL //
+            }
+            else                                                                                        // SEQUENTIAL //
+            {
+                //cout << "41" << endl ;
+                flag_success = 1 ;                                                                      // SEQUENTIAL //
+                Time += Deltat ;
+                double correction2 = 1. / Accepted_ratio ;
+                Deltat = Deltat / pow(correction2, Control_parameter) ;                                 // SEQUENTIAL //
+                cout << "                    SUCCES " << correction2 << endl;
+
+                /*double correction1 = max_mass ; Inv_Target_error ;                                    // SEQUENTIAL //
+                double correction2 = 1. / Accepted_ratio ;                                              // SEQUENTIAL //
+                if (correction1>correction2)
+                    Deltat = Deltat / pow(correction1, Control_parameter) ;                             // SEQUENTIAL //
+                else
+                    Deltat = Deltat / pow(correction2, Control_parameter) ; */                          // SEQUENTIAL //
+                if (Deltat>Contact_update_period)
+                    Deltat = Contact_update_period ;                                                    // SEQUENTIAL //
+                //cout << "42" << endl ;
+                Update_contact_pressures( Nb_bodies, Bodies ) ;                                         // SEQUENTIAL //
+                //cout << "43" << endl ;
+            }
         }
     }
 }

@@ -142,7 +142,7 @@ void Write_graphic(int Nb_bodies,
             borders.push_back(segmentstot[i]) ;
         }
     }
-    int nbtot = (int)borders.size() ;
+    //int nbtot = (int)borders.size() ;
 
     vector<int> bordernodestot(2*(int)borders.size()) ;
     for (int i=0 ; i<(int)borders.size() ; i++)
@@ -157,7 +157,7 @@ void Write_graphic(int Nb_bodies,
         if (bordernodestot[i]!=bordernodestot[i-1])
             bordernodes.push_back(bordernodestot[i]) ;
     }
-    int nbntot = (int)bordernodes.size() ;
+    //int nbntot = (int)bordernodes.size() ;
 
     /*
     Borders_file << "POINTS " << nbntot << " float" << endl ;
@@ -198,7 +198,7 @@ void Write_graphic(int Nb_bodies,
     */
 
 
-    double xvar, yvar, zvar ;
+    double xvar, yvar ;// zvar ;
     Graphic_file << "POINTS " << ntot << " float" << endl ;
     for (int j(0) ; j<ntot ; j++)
     {
@@ -913,7 +913,7 @@ void Write_graphic(int Nb_bodies,
 
     if ( To_Plot[39] == 1 )
     {
-        Graphic_file << "SCALARS 38_Temperature float 1" << endl ;
+        Graphic_file << "SCALARS 39_Temperature float 1" << endl ;
         Graphic_file << "LOOKUP_TABLE default" << endl ;
         for (int j(0) ; j<ntot ; j++)
         {
@@ -924,8 +924,23 @@ void Write_graphic(int Nb_bodies,
         Graphic_file << endl ;
     }
 
+    if ( To_Plot[40] == 1 )
+    {
+        Graphic_file << "SCALARS 40-Epsilon_Mass_Scaling float 1" << endl ;
+        Graphic_file << "LOOKUP_TABLE default" << endl ;
+        for (int j(0) ; j<ntot ; j++)
+        {
+            bo = indicestot[j][0] ;
+            no = indicestot[j][1] ;
+            Graphic_file << Bodies[bo].nodes[no].factor_mass_scaling << endl ;
+        }
+        Graphic_file << endl ;
+    }
+
     Graphic_file.close () ;
 }
+
+
 
 
 
@@ -1316,7 +1331,5 @@ void Write_chains(int Nb_bodies,
 
     Graphic_file.close () ;
 }
-
-
 
 #endif

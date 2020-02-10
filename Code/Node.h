@@ -42,8 +42,8 @@ public :
     vector<double> y_regions_internal_forces ;
     double x_contact_force ;
     double y_contact_force ;
-    //vector<double> x_master_contact_forces ;
-    //vector<double> y_master_contact_forces ;
+//    vector<double> x_master_contact_forces ;
+//    vector<double> y_master_contact_forces ;
     double x_self_contact_force ;
     double y_self_contact_force ;
     double x_body_force ;
@@ -88,6 +88,16 @@ public :
     double alid_alpha ;
     double alid_beta ;
 
+    // Mass scaling attributes
+    double delta_factor_mass_scaling ;
+    double factor_mass_scaling ;
+    double x_factor_mass_scaling ;
+    double y_factor_mass_scaling ;
+    double delta_x_factor_mass_scaling ;
+    double delta_y_factor_mass_scaling ;
+    double max_factor_mass_scaling;
+    double mass_mass_scaling;
+
     // Constructor and Destructor
     Node(double x, double y, double d, double mx, double my, double imx, double imy) ;
     ~Node() ;
@@ -103,6 +113,8 @@ public :
     void Apply_Euler(double dt) ;
     void Apply_Euler_temporary(double dt) ;
     void Compute_error(double& total_error, double& max_error, int& node_for_max_error, double& flagdrivenx, double& flagdriveny, int index) ;
+    void Compute_mass_scaling(double Target_error, double Inv_Target_error, double Control_parameter_mass_scaling, double Max_mass_scaling,
+                              double Error_factor_mass_scaling, double Accepted_ratio, double Decrease_factor_mass_scaling, double& max_factor_mass_scaling, int index, int num_node, double& total_mass_mass_scaling) ;
 } ;
 
 
@@ -141,8 +153,8 @@ Node::Node (double x, double y, double d, double mx, double my, double imx, doub
     y_regions_internal_forces = {0.} ;
     x_contact_force = 0. ;
     y_contact_force = 0. ;
-    //x_master_contact_forces = {0.} ;
-    //y_master_contact_forces = {0.} ;
+//    x_master_contact_forces = {0.} ;
+//    y_master_contact_forces = {0.} ;
     x_self_contact_force = 0. ;
     y_self_contact_force = 0. ;
     x_body_force = 0. ;
@@ -179,6 +191,13 @@ Node::Node (double x, double y, double d, double mx, double my, double imx, doub
     x_error = 0. ;
     y_error = 0. ;
     error_norm = 0. ;
+
+    factor_mass_scaling = 1. ;
+    x_factor_mass_scaling = 1. ;
+    y_factor_mass_scaling = 1. ;
+    delta_x_factor_mass_scaling = 1. ;
+    delta_y_factor_mass_scaling = 1. ;
+    mass_mass_scaling = 0. ;
 }
 
 Node::~Node()
@@ -201,21 +220,14 @@ void Node::Sum_up_forces()
         x_regions_internal_forces[i] = 0. ;
         y_regions_internal_forces[i] = 0. ;
     }
-    //for (int i(0) ; i<(int)x_master_contact_forces.size() ; i++)
-    //{
-    //    x_contact_force += x_master_contact_forces[i] ;
-    //    y_contact_force += y_master_contact_forces[i] ;
-    //    x_master_contact_forces[i] = 0. ;
-    //    y_master_contact_forces[i] = 0. ;
-    //}
     x_force = x_internal_force + x_contact_force + x_self_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force + x_alid_force ;
     y_force = y_internal_force + y_contact_force + y_self_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force + y_alid_force ;
 }
 
 void Node::Apply_Newton()
 {
-    x_acceleration_parameter = x_force * x_inverse_mass ;
-    y_acceleration_parameter = y_force * y_inverse_mass ;
+    x_acceleration_parameter = x_force * x_inverse_mass / x_factor_mass_scaling ;
+    y_acceleration_parameter = y_force * y_inverse_mass / y_factor_mass_scaling ;
 }
 
 void Node::Update_current_positions()
@@ -259,5 +271,52 @@ void Node::Compute_error(double& total_error, double& max_error, int& node_for_m
     }
 }
 
+void Node::Compute_mass_scaling(double Target_error, double Inv_Target_error, double Control_parameter_mass_scaling, double Max_mass_scaling,
+                                double Error_factor_mass_scaling, double Accepted_ratio, double Decrease_factor_mass_scaling, double& max_factor_mass_scaling, int index, int num_node, double& total_mass_mass_scaling)
+{
+
+    if (abs(x_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    {
+        delta_x_factor_mass_scaling = pow((abs(x_error * inverse_distance_estimator) - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+        x_factor_mass_scaling += delta_x_factor_mass_scaling ;
+        if (x_factor_mass_scaling > Max_mass_scaling)
+            x_factor_mass_scaling = Max_mass_scaling ;
+        //cout << "error  : "  << x_error << " " << delta_x_factor_mass_scaling << " " << x_factor_mass_scaling << endl ;
+    }
+    else
+    {
+        if (x_factor_mass_scaling != 1)
+            x_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (x_factor_mass_scaling < 1)
+            x_factor_mass_scaling = 1;
+    }
+
+
+    if (abs(y_error * inverse_distance_estimator) >= Target_error * Error_factor_mass_scaling)
+    {
+        delta_y_factor_mass_scaling = pow((abs(y_error * inverse_distance_estimator) - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+        y_factor_mass_scaling += delta_y_factor_mass_scaling ;
+        if (y_factor_mass_scaling > Max_mass_scaling)
+            y_factor_mass_scaling = Max_mass_scaling ;
+    }
+    else
+    {
+        if (y_factor_mass_scaling != 1)
+            y_factor_mass_scaling *= Decrease_factor_mass_scaling ;
+        if (y_factor_mass_scaling < 1)
+            y_factor_mass_scaling = 1;
+    }
+
+
+    factor_mass_scaling = (x_factor_mass_scaling + y_factor_mass_scaling) * 0.5 ;
+
+    if(factor_mass_scaling > max_factor_mass_scaling)
+    {
+        max_factor_mass_scaling = factor_mass_scaling ;
+    }
+
+    mass_mass_scaling = sqrt(x_mass * x_mass * x_factor_mass_scaling * x_factor_mass_scaling + y_mass * y_mass * y_factor_mass_scaling * y_factor_mass_scaling) ;
+    total_mass_mass_scaling += mass_mass_scaling ;
+}
 
 #endif

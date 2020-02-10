@@ -143,6 +143,15 @@ public :
     double density ;
     vector<vector<double>> contact_forces_to_send ;
     vector<vector<int>> contact_forces_to_send_to ;
+
+    // Mass scaling attributes
+    double delta_factor_mass_scaling ;
+    double stored_delta_factor_mass_scaling ;
+    double factor_mass_scaling ;
+    double max_factor_mass_scaling ;
+    double mass_mass_scaling;
+
+    //Thermal attributes
     double heat_capacity ;
     double temperature ;
 
@@ -165,7 +174,7 @@ public :
     void Update_damping_forces() ;
     void Initialize_contact_forces() ;
     void Update_contacts(vector<Body>& b, double xmin, double xmax) ;
-    void Update_contact_forces(double dt, vector<Body>& b, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax  ) ;
+    void Update_contact_forces(double dt, vector<Body>& b, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax) ;
     void Send_contact_forces(vector<Body>& b) ;
     void Sum_up_forces() ;
     void Apply_Newton() ;
@@ -176,6 +185,7 @@ public :
     void Update_current_positions() ;
     void Compute_nodal_stresses(int Nb_materials, vector<Material>& Materials) ;
     void Compute_error() ;
+    void Compute_mass_scaling(double Target_error, double Inv_Target_error, double Control_parameter_mass_scaling, double Max_mass_scaling, double Error_factor_mass_scaling, double Accepted_ratio, double Decrease_factor_mass_scaling) ;
     void Store() ;
     void Restore() ;
     void Update_damage() ;
@@ -207,6 +217,8 @@ Body::Body (int i, string m, string p, string t)
     inertia = 0. ;
     inverse_mass = 0. ;
     inverse_inertia = 0. ;
+    delta_factor_mass_scaling = 0. ;
+    factor_mass_scaling = 1. ;
     x_initial = 0. ;
     y_initial = 0. ;
     r_initial = 0. ;
@@ -243,9 +255,9 @@ Body::Body (int i, string m, string p, string t)
     x_contact_force = 0. ;
     y_contact_force = 0. ;
     r_contact_force = 0. ;
-    //x_master_contact_forces = {0.} ;
-    //y_master_contact_forces = {0.} ;
-    //r_master_contact_forces = {0.} ;
+//    x_master_contact_forces = {0.} ;
+//    y_master_contact_forces = {0.} ;
+//    r_master_contact_forces = {0.} ;
     x_body_force = 0. ;
     y_body_force = 0. ;
     r_body_force = 0. ;
@@ -666,7 +678,6 @@ void Body::Update_bc_forces()
         int border_node, number_influencing_nodes ;
         vector<int> border_nodes, influencing_nodes ;
         vector<double> shape_functions ;
-        int n ;
         for (int n(0) ; n<nb_nodes ; n++)
         {
             nodes[n].x_neumann_force = 0. ;
@@ -954,7 +965,7 @@ void Body::Update_internal_forces( int region, int Nb_materials, vector<Material
     //
     Elastic_energy[region] = 0. ;
     int i ;
-    double energy, c0, J, Mu, Kappa, Lambda ;
+    double energy, c0(0), J, Mu, Kappa, Lambda ;
     for (int ii(0) ; ii<(int)region_gpoints[region].size() ; ii++)
     {
         i = region_gpoints[region][ii] ;
@@ -1155,7 +1166,7 @@ void Body::Update_alid_forces(double Time)
         return ;
     else if (flag_alid==0)
         return ;
-    double beta, pvx, pvy ;
+    double beta, pvx(0), pvy(0) ;
     int flag_alidx, flag_alidy ;
     int nb ;
     double t0, t1, p0, p1 ;
@@ -1630,10 +1641,10 @@ void Body::Update_contacts(vector<Body>& Bodies, double xmin, double xmax)
 
 void Body::Update_contact_forces( double Deltat, vector<Body>& Bodies, int Nb_contact_laws, vector<Contact_law>& Contact_laws, vector<vector<int>>& Contacts_Table, double xmin, double xmax )
 {
-    int bodyM, shiftM, borderS, border_nodeS, nodeS, nodeM0, nodeM1, nodeM2, nodeM3, neig, Contact_law_index ;
+    int bodyM, shiftM, borderS, border_nodeS, nodeS, nodeM0, nodeM1, nodeM2, nodeM3, Contact_law_index; // neig ;
     double shapeM0, shapeM1, shapeM2, shapeM3 ;
     double  gapn, vgapn, gapt, vgapt, xnorm, ynorm, xtan, ytan, effective_mass ;
-    double Pn, Pt, Px, Py, Fsx, Fsy, length, initial_length, dx, dy, W ;
+    double Pn, Pt, Px, Py, Fsx(0), Fsy(0), length, initial_length, dx, dy, W ;
     string contact_law_type, length_evolution, material_nameM ;
     vector<double> parameters ;
     string material1, material2 ;
@@ -1863,14 +1874,14 @@ void Body::Update_contact_forces( double Deltat, vector<Body>& Bodies, int Nb_co
             r_contact_force += -Fsx * dy + Fsy * dx ;
         }
 
-        for (int j(0) ; j<Bodies[bodyM].nb_neighbours ; j++)
-        {
-            if (Bodies[bodyM].neighbours[j][0] == index) ;
-            {
-                neig = j ;
-                break ;
-            }
-        }
+//        for (int j(0) ; j<Bodies[bodyM].nb_neighbours ; j++)
+//        {
+//            if (Bodies[bodyM].neighbours[j][0] == index)
+//            {
+//                neig = j ;
+//                break ;
+//            }
+//        }
 
         if (Bodies[bodyM].type=="deformable")
         {
@@ -1984,6 +1995,7 @@ void Body::Sum_up_forces()
         x_force = x_contact_force + x_body_force + x_dirichlet_force + x_neumann_force + x_damping_force ;
         y_force = y_contact_force + y_body_force + y_dirichlet_force + y_neumann_force + y_damping_force ;
         r_force = r_contact_force + r_body_force + r_dirichlet_force + r_neumann_force + r_damping_force ;
+
         for (int i(0) ; i<nb_nodes ; i++)
         {
             nodes[i].x_contact_force = x_contact_force ;
@@ -2019,9 +2031,9 @@ void Body::Apply_Newton()
     }
     else if (type=="rigid")
     {
-        x_acceleration = x_force * inverse_mass ;
-        y_acceleration = y_force * inverse_mass ;
-        r_acceleration = r_force * inverse_inertia ;
+        x_acceleration = x_force * inverse_mass / factor_mass_scaling ;
+        y_acceleration = y_force * inverse_mass / factor_mass_scaling ;
+        r_acceleration = r_force * inverse_inertia / factor_mass_scaling ;
     }
     for (int i(0) ; i<nb_nodes ; i++)
     {
@@ -2222,7 +2234,7 @@ void Body::Update_kinematics()
 
 void Body::Update_kinematics_temporary()
 {
-    double dx, dy, dr, vx, vy, ax, ay ;
+    double dx, dy, dr; // vx, vy, ax, ay ;
     if (type=="deformable")
     {
         for (int i(0) ; i<nb_nodes ; i++)
@@ -2318,7 +2330,7 @@ void Body::Compute_nodal_stresses( int Nb_materials, vector<Material>& Materials
         int number_influencing_nodes ;
         vector<int> influencing_nodes ;
         vector<double> shape_xderiv, shape_yderiv ;
-        double J, Sigmaxx, Sigmayy, Sigmaxy, Sigmazz, Mu, Lambda, Kappa, energy, Exx, Eyy, Exy, NormE ;
+        double J, Sigmaxx(0), Sigmayy(0), Sigmaxy(0), Sigmazz(0), Mu, Lambda, Kappa, energy, Exx(0), Eyy(0), Exy(0), NormE(0) ;
         //vector<vector<double>> S={{0,0,0},{0,0,0},{0,0,0}};
         //vector<vector<double>> E={{0,0,0},{0,0,0},{0,0,0}};
         //vector<vector<double>> Eref={{0,0,0},{0,0,0},{0,0,0}};
@@ -2540,6 +2552,46 @@ void Body::Compute_error()
     }
 }
 
+//********************************************//
+//** COMPUTE MASS SCALING ********************//
+//********************************************//
+
+void Body::Compute_mass_scaling(double Target_error, double Inv_Target_error, double Control_parameter_mass_scaling, double Max_mass_scaling,
+                                double Error_factor_mass_scaling, double Accepted_ratio, double Decrease_factor_mass_scaling)
+{
+    mass_mass_scaling = 0. ;
+
+    if (type == "deformable")
+    {
+        max_factor_mass_scaling = 0. ;
+        for (int i(0) ; i<nb_nodes ; i++)
+            nodes[i].Compute_mass_scaling(Target_error, Inv_Target_error, Control_parameter_mass_scaling, Max_mass_scaling, Error_factor_mass_scaling,
+                                          Accepted_ratio, Decrease_factor_mass_scaling, max_factor_mass_scaling, index, i, mass_mass_scaling) ;
+
+    }
+    else if (type == "rigid")
+    {
+
+        //ADDITIVE
+        if (total_error >= Target_error * Error_factor_mass_scaling)
+        {
+            delta_factor_mass_scaling = pow((total_error - Target_error * Error_factor_mass_scaling), Control_parameter_mass_scaling) ;
+            factor_mass_scaling += delta_factor_mass_scaling ;
+            if (factor_mass_scaling >= Max_mass_scaling)
+                factor_mass_scaling = Max_mass_scaling ;
+        }
+        else
+        {
+            if(factor_mass_scaling != 1)
+                factor_mass_scaling *= Decrease_factor_mass_scaling ;
+            if(factor_mass_scaling < 1)
+                factor_mass_scaling = 1;
+        }
+
+        mass_mass_scaling = mass * factor_mass_scaling ;
+    }
+
+}
 
 
 //********************************************//
@@ -2558,6 +2610,7 @@ void Body::Store()
     stored_neumann_work = neumann_work ;
     stored_damping_work = damping_work ;
     stored_alid_work = alid_work ;
+    stored_delta_factor_mass_scaling = delta_factor_mass_scaling ;
     if (type=="rigid")
     {
         stored_x_current = x_current ;
@@ -2590,6 +2643,7 @@ void Body::Restore()
     neumann_work = stored_neumann_work ;
     damping_work = stored_damping_work ;
     alid_work = stored_alid_work ;
+    delta_factor_mass_scaling = stored_delta_factor_mass_scaling ;
     if (type=="rigid")
     {
         x_current = stored_x_current ;
@@ -2654,7 +2708,7 @@ void Body::Update_damage()
 void Body::Update_material( int Nb_materials, vector<Material>& Materials, vector<int> flags )
 {
     //cout << "Updating Material Properties of Body " << index << endl ;
-    double Rho, Alpha, Beta, Mu, Lambda, Kappa, E, Nu ;
+    double Rho(0), Alpha(0), Beta(0), Mu(0), Lambda(0), Kappa, E(0), Nu(0) ;
     string material_type ;
     vector<double> parameters ;
     int dof0, dof1 ;
@@ -2699,6 +2753,7 @@ void Body::Update_material( int Nb_materials, vector<Material>& Materials, vecto
         if (flags[4] == 1)
         {
             double dm ;
+            mass = 0. ;
             for (int i(0) ; i<nb_nodes ; i++)
             {
                 nodes[i].x_mass = 0. ;
@@ -2722,6 +2777,8 @@ void Body::Update_material( int Nb_materials, vector<Material>& Materials, vecto
                 nodes[i].y_mass *= Rho ;
                 nodes[i].x_inverse_mass = 1. / nodes[i].x_mass ;
                 nodes[i].y_inverse_mass = 1. / nodes[i].y_mass ;
+                mass += sqrt(nodes[i].x_mass * nodes[i].x_mass + nodes[i].y_mass * nodes[i].y_mass);
+                inverse_mass = 1/mass;
             }
         }
         if (flags[5] == 1)
@@ -2847,8 +2904,5 @@ void Body::Update_material( int Nb_materials, vector<Material>& Materials, vecto
         inverse_inertia = 1. / inertia ;
     }
 }
-
-
-
 
 #endif

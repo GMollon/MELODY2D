@@ -412,9 +412,4 @@ double Triangle_inertia(double x0, double y0, double x1, double y1, double x2, d
     return abs( inertia / 6. ) ;
 }
 
-
-
-
-
-
 #endif

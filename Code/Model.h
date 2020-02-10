@@ -505,9 +505,4 @@ void Apply_Bonded_Mohr_Coulomb(double kn, double kt, double kbond, double fricbo
     }
 }
 
-
-
-
-
-
 #endif

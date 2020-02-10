@@ -17,6 +17,7 @@ void Read_spy_line(
     double bo ;
     double n ;
     double xmin, xmax, ymin, ymax ;
+
     Static_Control_file >> Keyword ;
     if (Keyword == "Position")
     {
@@ -499,12 +500,91 @@ void Read_spy_line(
             New_Read = { 10, 6, b } ;
         }
     }
-    else if (Keyword == "Polar")
+    else if (Keyword == "Error")
     {
-        Static_Control_file >> Keyword >> n >> xmin >> xmax >> ymin >> ymax ;
-        if (Keyword == "Contact_Normal")
+        Static_Control_file >> Keyword ;
+        if (Keyword == "X")
         {
-            New_Read = { 11, 0, n, xmin, xmax, ymin, ymax } ;
+            Static_Control_file >> b >> n ;
+            New_Read = { 11, 0, b, n } ;
+        }
+        else if (Keyword == "Y")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 11, 1, b, n } ;
+        }
+        else if (Keyword == "Mag")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 11, 2, b, n } ;
+        }
+        else if (Keyword == "Norm")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 11, 3, b, n } ;
+        }
+        else if (Keyword == "Max")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 11, 4, b, n } ;
+        }
+    }
+    else if (Keyword == "MassScaling")
+    {
+        Static_Control_file >> Keyword ;
+        if (Keyword == "X")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 0, b, n } ;
+        }
+        else if (Keyword == "Y")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 1, b, n } ;
+        }
+        else if (Keyword == "Moy")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 2, b, n } ;
+        }
+        else if (Keyword == "dX")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 3, b, n } ;
+        }
+        else if (Keyword == "dY")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 4, b, n } ;
+        }
+        else if (Keyword == "dMoy")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 5, b, n } ;
+        }
+        else if (Keyword == "Xmass")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 6, b, n } ;
+        }
+        else if (Keyword == "Ymass")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 7, b, n } ;
+        }
+        else if (Keyword == "Mass")
+        {
+            Static_Control_file >> b >> n ;
+            New_Read = { 12, 8, b, n } ;
+        }
+
+        else if (Keyword == "Polar")
+        {
+            Static_Control_file >> Keyword >> n >> xmin >> xmax >> ymin >> ymax ;
+            if (Keyword == "Contact_Normal")
+            {
+                New_Read = { 11, 0, n, xmin, xmax, ymin, ymax } ;
+            }
         }
     }
 }
@@ -527,8 +607,13 @@ void Load_static(
     double& Deltat,
     double& Tend,
     double& Target_error,
+    double& Inv_Target_error,
     double& Control_parameter,
     double& Accepted_ratio,
+    double& Max_mass_scaling,
+    double& Control_parameter_mass_scaling,
+    double& Error_factor_mass_scaling,
+    double& Decrease_factor_mass_scaling,
     double& Save_period,
     double& Print_period,
     double& Contact_update_period,
@@ -561,7 +646,7 @@ void Load_static(
     ifstream Static_Control_file ("STATIC_CONTROL.asc") ;
     string line ;
     string token ;
-    int flag_body_rigid ;
+    int flag_body_rigid(0) ;
     while(getline(Static_Control_file, line))
     {
         if (line.substr(0,15)=="SIMULATION_NAME")
@@ -714,7 +799,7 @@ void Load_static(
                 c[i] = -1 ;
             for (int i=0 ; i<Nb_materials ; i++)
                 Contacts_Table.push_back(c) ;//Contacts_Table[i] = c ;
-            int nn, pp ;
+            int nn(0), pp(0) ;
             for (int i=0 ; i<Nb_contact_laws ; i++)
             {
                 for (int n(0) ; n<Nb_materials ; n++)
@@ -737,14 +822,75 @@ void Load_static(
         {
             Static_Control_file >> Solver ;
             getline(Static_Control_file, token) ;
-            Static_Control_file >> Tini >> Deltat >> Tend ;
-            getline(Static_Control_file, token) ;
-            Static_Control_file >> Target_error >> Control_parameter >> Accepted_ratio ;
-            getline(Static_Control_file, token) ;
-            Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
-            getline(Static_Control_file, token) ;
-            cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << ' ' << Target_error << ' ' << Control_parameter << ' ' << Accepted_ratio << endl ;
-            cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+
+
+            if(Solver == "Euler")
+            {
+                Static_Control_file >> Tini >> Deltat >> Tend ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Target_error >> Control_parameter >> Accepted_ratio ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
+                getline(Static_Control_file, token) ;
+                cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << ' ' << Target_error << ' ' << Control_parameter << ' ' << Accepted_ratio << endl ;
+                cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+                Inv_Target_error = 1 / Target_error ;
+            }
+            if(Solver == "Euler_2")
+            {
+                Static_Control_file >> Tini >> Deltat >> Tend ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
+                getline(Static_Control_file, token) ;
+                cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << endl ;
+                cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+            }
+            else if(Solver == "Adaptive_Euler")
+            {
+                Static_Control_file >> Tini >> Deltat >> Tend ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Target_error >> Control_parameter >> Accepted_ratio ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
+                getline(Static_Control_file, token) ;
+                cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << ' ' << Target_error << ' ' << Control_parameter << ' ' << Accepted_ratio << endl ;
+                cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+                Inv_Target_error = 1 / Target_error ;
+            }
+            else if(Solver == "Mass_Scaling")
+            {
+                Static_Control_file >> Tini >> Deltat >> Tend ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Target_error >> Control_parameter >> Accepted_ratio ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Max_mass_scaling >> Control_parameter_mass_scaling >> Error_factor_mass_scaling >> Decrease_factor_mass_scaling ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
+                getline(Static_Control_file, token) ;
+                cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << ' ' << Target_error << ' ' << Control_parameter << ' ' << Accepted_ratio << endl ;
+                cout << "Mass scaling " << Max_mass_scaling << ' ' << Control_parameter_mass_scaling << ' ' << Error_factor_mass_scaling << ' ' << Decrease_factor_mass_scaling << endl ;
+                cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+                Inv_Target_error = 1 / Target_error ;
+            }
+            else if(Solver == "Adaptive_Mass_Scaling")
+            {
+                Static_Control_file >> Tini >> Deltat >> Tend ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Target_error >> Control_parameter >> Accepted_ratio ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Max_mass_scaling >> Control_parameter_mass_scaling >> Error_factor_mass_scaling >> Decrease_factor_mass_scaling ;
+                getline(Static_Control_file, token) ;
+                Static_Control_file >> Save_period >> Print_period >> Contact_update_period ;
+                getline(Static_Control_file, token) ;
+                cout << "Solver " << Solver << ' ' << Tini << ' ' << Deltat << ' ' << Tend << ' ' << Target_error << ' ' << Control_parameter << ' ' << Accepted_ratio << endl ;
+                cout << "Mass scaling " << Max_mass_scaling << ' ' << Control_parameter_mass_scaling << ' ' << Error_factor_mass_scaling << ' ' << Decrease_factor_mass_scaling << endl ;
+                cout << Save_period << ' ' << Print_period << ' ' << Contact_update_period << endl ;
+                Inv_Target_error = 1 / Target_error ;
+            }
+
+
+
+
         }
 
         if (line.substr(0,19)=="PERIODIC_BOUNDARIES")
@@ -854,7 +1000,8 @@ void Load_static(
         if (line.substr(0,7)=="GRAPHIC")
         {
             int j ;
-            for (int i(0) ; i < 40 ; i++)
+
+            for (int i(0) ; i < 41 ; i++)
             {
                 Static_Control_file >> j >> token ;
                 getline(Static_Control_file, token) ;
@@ -1248,7 +1395,7 @@ void Load_static(
         if (line.substr(0,4)=="ALID")
         {
             int number_xalid_values, number_yalid_values ;
-            double xmin, xmax, ymin, ymax, range, alphain, alphaout, betain, betaout, exponent, k ;
+            double xmin, xmax, ymin, ymax, range, alphain, alphaout, betain, betaout, exponent ;
             Static_Control_file >> number_xalid_values >> number_yalid_values >> xmin >> xmax >> ymin >> ymax >> range >> alphain >> alphaout >> betain >> betaout >> exponent ;
             cout << number_xalid_values << ' ' << number_yalid_values << ' ' << xmin << ' ' << xmax << ' ' << ymin << ' ' << ymax << ' ' << range << endl ;
             getline(Static_Control_file, token) ;
@@ -1263,11 +1410,11 @@ void Load_static(
             Bodies[index_body].alid_betain = betain ;
             Bodies[index_body].alid_betaout = betaout ;
             Bodies[index_body].alid_exponent = exponent ;
-            if (number_xalid_values==0 & number_yalid_values==0)
+            if ((number_xalid_values==0) & (number_yalid_values==0))
             {
                 Bodies[index_body].flag_alid = 0 ;
             }
-            else if (number_xalid_values>0 & number_yalid_values==0)
+            else if ((number_xalid_values>0) & (number_yalid_values==0))
             {
                 vector<double> xalid_instants ;
                 double xalid_instant ;
@@ -1284,7 +1431,7 @@ void Load_static(
                 Bodies[index_body].xalid_instants = xalid_instants ;
                 Bodies[index_body].xalid_values = xalid_values ;
             }
-            else if (number_xalid_values==0 & number_yalid_values>0)
+            else if ((number_xalid_values==0) & (number_yalid_values>0))
             {
                 vector<double> yalid_instants ;
                 double yalid_instant ;
@@ -1301,7 +1448,7 @@ void Load_static(
                 Bodies[index_body].yalid_instants = yalid_instants ;
                 Bodies[index_body].yalid_values = yalid_values ;
             }
-            else if (number_xalid_values>0 & number_yalid_values>0)
+            else if ((number_xalid_values>0) & (number_yalid_values>0))
             {
                 vector<double> xalid_instants ;
                 double xalid_instant ;
@@ -1384,7 +1531,6 @@ void Load_static(
             if (flag_body_rigid==0)
             {
                 nd += 2 * nb_nodes ;
-                Bodies[index_body].mass = 0. ;
                 double j, ka, kb, temp, xini, yini, d, mx, my, imx, imy ;
                 for (int i(0) ; i < nb_nodes ; i++)
                 {
@@ -1397,7 +1543,6 @@ void Load_static(
                                      >> imx
                                      >> imy ;
                     getline(Static_Data_file, token) ;
-                    Bodies[index_body].mass += mx ;
                     Node node ( xini, yini, d, mx, my, imx, imy ) ;
                     //
                     node.alid_alpha = 0. ;
@@ -1458,10 +1603,9 @@ void Load_static(
                     */
                     nodes.push_back(node) ;
                 }
-                Bodies[index_body].inverse_mass = 1. / Bodies[index_body].mass ;
-                Bodies[index_body].nodes = nodes ;
-                Bodies[index_body].stored_nodes = nodes ;
-                Bodies[index_body].nb_nodes = nb_nodes ;
+                Bodies[index_body].nodes=nodes ;
+                Bodies[index_body].stored_nodes=nodes ;
+                Bodies[index_body].nb_nodes=nb_nodes ;
             }
             else if (flag_body_rigid==1)
             {
@@ -1742,7 +1886,7 @@ void Load_dynamic(
     cout << endl ;
     cout << "Loading dynamic data of file " << Number_save << endl ;
     int index_body = 0 ;
-    int flag_body_rigid ;
+    int flag_body_rigid(0) ;
     //flags = { 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 } ;
     string filename ;
     stringstream sfilename ;
@@ -1765,7 +1909,6 @@ void Load_dynamic(
     {
         if( flags[7] == 0 )
             cout << line << endl ;
-
         if (line.substr(0,13)=="KILL_VELOCITY")
             flags[0] = 1 ;
         if (line.substr(0,14)=="MONITOR_ENERGY")
@@ -1788,6 +1931,7 @@ void Load_dynamic(
             flags[9] = 1 ;
         if (line.substr(0,10)=="RESET_WORK")
             flags[10] = 1 ;
+
 
         if (line.substr(0,6)=="SOLVER")
         {
@@ -2103,6 +2247,7 @@ void Load_dynamic(
                     {
                         Dynamic_file >> vi ;
                         internal.push_back(vi) ;
+                        //internal[j] = vi ;
                     }
                 }
                 new_element.borderS = bos ;
@@ -2554,6 +2699,5 @@ void Write_spying(vector<vector<vector<double>>>& spying,
         spying[n].clear() ;
     }
 }
-
 
 #endif
